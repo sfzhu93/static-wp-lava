@@ -123,32 +123,32 @@ static_wp_lava/fast:
 	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/build
 .PHONY : static_wp_lava/fast
 
-MainPass.o: MainPass.cpp.o
+src/MainPass.o: src/MainPass.cpp.o
 
-.PHONY : MainPass.o
+.PHONY : src/MainPass.o
 
 # target to build an object file
-MainPass.cpp.o:
-	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/MainPass.cpp.o
-.PHONY : MainPass.cpp.o
+src/MainPass.cpp.o:
+	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o
+.PHONY : src/MainPass.cpp.o
 
-MainPass.i: MainPass.cpp.i
+src/MainPass.i: src/MainPass.cpp.i
 
-.PHONY : MainPass.i
+.PHONY : src/MainPass.i
 
 # target to preprocess a source file
-MainPass.cpp.i:
-	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/MainPass.cpp.i
-.PHONY : MainPass.cpp.i
+src/MainPass.cpp.i:
+	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.i
+.PHONY : src/MainPass.cpp.i
 
-MainPass.s: MainPass.cpp.s
+src/MainPass.s: src/MainPass.cpp.s
 
-.PHONY : MainPass.s
+.PHONY : src/MainPass.s
 
 # target to generate assembly for a file
-MainPass.cpp.s:
-	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/MainPass.cpp.s
-.PHONY : MainPass.cpp.s
+src/MainPass.cpp.s:
+	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.s
+.PHONY : src/MainPass.cpp.s
 
 # Help Target
 help:
@@ -159,9 +159,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... static_wp_lava"
 	@echo "... edit_cache"
-	@echo "... MainPass.o"
-	@echo "... MainPass.i"
-	@echo "... MainPass.s"
+	@echo "... src/MainPass.o"
+	@echo "... src/MainPass.i"
+	@echo "... src/MainPass.s"
 .PHONY : help
 
 

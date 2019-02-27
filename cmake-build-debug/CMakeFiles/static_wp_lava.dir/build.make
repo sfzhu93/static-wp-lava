@@ -57,27 +57,27 @@ include CMakeFiles/static_wp_lava.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/static_wp_lava.dir/flags.make
 
-CMakeFiles/static_wp_lava.dir/MainPass.cpp.o: CMakeFiles/static_wp_lava.dir/flags.make
-CMakeFiles/static_wp_lava.dir/MainPass.cpp.o: ../MainPass.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/static_wp_lava.dir/MainPass.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/static_wp_lava.dir/MainPass.cpp.o -c /home/suz305/wp-study/static-wp-lava/MainPass.cpp
+CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o: CMakeFiles/static_wp_lava.dir/flags.make
+CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o: ../src/MainPass.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o -c /home/suz305/wp-study/static-wp-lava/src/MainPass.cpp
 
-CMakeFiles/static_wp_lava.dir/MainPass.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/static_wp_lava.dir/MainPass.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/suz305/wp-study/static-wp-lava/MainPass.cpp > CMakeFiles/static_wp_lava.dir/MainPass.cpp.i
+CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/suz305/wp-study/static-wp-lava/src/MainPass.cpp > CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.i
 
-CMakeFiles/static_wp_lava.dir/MainPass.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/static_wp_lava.dir/MainPass.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suz305/wp-study/static-wp-lava/MainPass.cpp -o CMakeFiles/static_wp_lava.dir/MainPass.cpp.s
+CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suz305/wp-study/static-wp-lava/src/MainPass.cpp -o CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.s
 
 # Object files for target static_wp_lava
 static_wp_lava_OBJECTS = \
-"CMakeFiles/static_wp_lava.dir/MainPass.cpp.o"
+"CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o"
 
 # External object files for target static_wp_lava
 static_wp_lava_EXTERNAL_OBJECTS =
 
-libstatic_wp_lava.so: CMakeFiles/static_wp_lava.dir/MainPass.cpp.o
+libstatic_wp_lava.so: CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o
 libstatic_wp_lava.so: CMakeFiles/static_wp_lava.dir/build.make
 libstatic_wp_lava.so: CMakeFiles/static_wp_lava.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX shared library libstatic_wp_lava.so"

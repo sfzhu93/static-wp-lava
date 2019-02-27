@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/suz305/wp-study/static-wp-lava/MainPass.cpp" "/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/static_wp_lava.dir/MainPass.cpp.o"
+  "/home/suz305/wp-study/static-wp-lava/src/MainPass.cpp" "/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
