@@ -1,0 +1,4 @@
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/suz305/wp-study/static-wp-lava
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/suz305/wp-study/static-wp-lava/cmake-build-debug
