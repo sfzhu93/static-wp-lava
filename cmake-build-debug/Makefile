@@ -150,6 +150,33 @@ src/MainPass.cpp.s:
 	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.s
 .PHONY : src/MainPass.cpp.s
 
+src/WpExpr.o: src/WpExpr.cpp.o
+
+.PHONY : src/WpExpr.o
+
+# target to build an object file
+src/WpExpr.cpp.o:
+	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o
+.PHONY : src/WpExpr.cpp.o
+
+src/WpExpr.i: src/WpExpr.cpp.i
+
+.PHONY : src/WpExpr.i
+
+# target to preprocess a source file
+src/WpExpr.cpp.i:
+	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.i
+.PHONY : src/WpExpr.cpp.i
+
+src/WpExpr.s: src/WpExpr.cpp.s
+
+.PHONY : src/WpExpr.s
+
+# target to generate assembly for a file
+src/WpExpr.cpp.s:
+	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.s
+.PHONY : src/WpExpr.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,6 +189,9 @@ help:
 	@echo "... src/MainPass.o"
 	@echo "... src/MainPass.i"
 	@echo "... src/MainPass.s"
+	@echo "... src/WpExpr.o"
+	@echo "... src/WpExpr.i"
+	@echo "... src/WpExpr.s"
 .PHONY : help
 
 

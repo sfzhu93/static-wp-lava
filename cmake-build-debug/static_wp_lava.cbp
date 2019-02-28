@@ -94,6 +94,12 @@
 		<Unit filename="/home/suz305/wp-study/static-wp-lava/src/MainPass.h">
 			<Option target="static_wp_lava"/>
 		</Unit>
+		<Unit filename="/home/suz305/wp-study/static-wp-lava/src/WpExpr.cpp">
+			<Option target="static_wp_lava"/>
+		</Unit>
+		<Unit filename="/home/suz305/wp-study/static-wp-lava/src/WpExpr.h">
+			<Option target="static_wp_lava"/>
+		</Unit>
 		<Unit filename="/home/suz305/wp-study/static-wp-lava/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

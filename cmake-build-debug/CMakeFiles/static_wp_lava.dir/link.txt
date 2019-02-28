@@ -1,1 +1,1 @@
-/usr/bin/c++ -fPIC -g  -shared -Wl,-soname,libstatic_wp_lava.so -o libstatic_wp_lava.so CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o  -L/usr/local/lib 
+/usr/bin/c++ -fPIC -g  -shared -Wl,-soname,libstatic_wp_lava.so -o libstatic_wp_lava.so CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o  -L/usr/local/lib 

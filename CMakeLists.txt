@@ -7,7 +7,7 @@ add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 link_directories(${LLVM_LIBRARY_DIRS})
 
-add_library(static_wp_lava SHARED src/MainPass.cpp src/MainPass.h)
+add_library(static_wp_lava SHARED src/MainPass.cpp src/MainPass.h src/WpExpr.cpp src/WpExpr.h)
 
 set_target_properties(static_wp_lava PROPERTIES
         COMPILE_FLAGS "-fno-rtti"
