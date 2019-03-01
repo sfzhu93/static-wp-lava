@@ -3,7 +3,7 @@
 //
 
 #include "WpExpr.h"
-namespace WpExpr{
+/*namespace WpExpr{
     Node::NodePtr BinOp::substitute(std::string &name, Node::NodePtr node) {
         if (dynamic_cast<Var&>(*(this->left))
             this->left->substitute(name, node);
@@ -12,3 +12,4 @@ namespace WpExpr{
     }
 
 }
+*/
