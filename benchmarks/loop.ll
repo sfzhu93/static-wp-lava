@@ -1,80 +1,75 @@
 ; ModuleID = 'benchmarks/loop.bc'
 target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
-target triple = "x86_64-unknown-linux-gnu"
+target triple = "x86_64-pc-linux-gnu"
 
 @.str = private unnamed_addr constant [2 x i8] c".\00", align 1
 @.str.1 = private unnamed_addr constant [4 x i8] c"119\00", align 1
 
 ; Function Attrs: noinline nounwind uwtable
 define void @_wp_begin() #0 {
-entry:
   %putchar = tail call i32 @putchar(i32 46) #3
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define i8* @_wp_end(i8* readnone %a) #0 {
-entry:
   %putchar = tail call i32 @putchar(i32 46) #3
   ret i8* %a
 }
 
 ; Function Attrs: nounwind uwtable
 define i32 @main() #1 {
-entry:
-  %call = tail call i32 @hello(i32 100, i32 100000, i32 100)
-  ret i32 %call
+  %1 = tail call i32 @hello(i32 100, i32 100000, i32 100)
+  ret i32 %1
 }
 
 ; Function Attrs: nounwind uwtable
 define i32 @hello(i32 %a, i32 %b, i32 %c) #1 {
-entry:
   tail call void @_wp_begin()
-  %cmp.19 = icmp slt i32 %a, %b
-  br i1 %cmp.19, label %for.body.lr.ph, label %for.cond.cleanup
+  %1 = icmp slt i32 %a, %b
+  br i1 %1, label %.lr.ph, label %._crit_edge
 
-for.body.lr.ph:                                   ; preds = %entry
-  %add = add nsw i32 %b, %a
-  %div = sdiv i32 %add, 2
-  br label %for.body
+.lr.ph:                                           ; preds = %0
+  %2 = add nsw i32 %b, %a
+  %3 = sdiv i32 %2, 2
+  br label %5
 
-for.cond.cleanup:                                 ; preds = %for.inc, %entry
-  %c.addr.0.lcssa = phi i32 [ %c, %entry ], [ %c.addr.1, %for.inc ]
-  %call6 = tail call i8* @_wp_end(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.1, i64 0, i64 0))
-  ret i32 %c.addr.0.lcssa
+._crit_edge:                                      ; preds = %14, %0
+  %.0.lcssa = phi i32 [ %c, %0 ], [ %.1, %14 ]
+  %4 = tail call i8* @_wp_end(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.1, i64 0, i64 0))
+  ret i32 %.0.lcssa
 
-for.body:                                         ; preds = %for.inc, %for.body.lr.ph
-  %i.021 = phi i32 [ %a, %for.body.lr.ph ], [ %inc, %for.inc ]
-  %c.addr.020 = phi i32 [ %c, %for.body.lr.ph ], [ %c.addr.1, %for.inc ]
-  %cmp1 = icmp sgt i32 %i.021, %div
-  br i1 %cmp1, label %if.then, label %if.else
+; <label>:5                                       ; preds = %14, %.lr.ph
+  %i.02 = phi i32 [ %a, %.lr.ph ], [ %15, %14 ]
+  %.01 = phi i32 [ %c, %.lr.ph ], [ %.1, %14 ]
+  %6 = icmp sgt i32 %i.02, %3
+  br i1 %6, label %7, label %11
 
-if.then:                                          ; preds = %for.body
-  %sub = add nsw i32 %i.021, -1
-  %call = tail call i32 @f(i32 %i.021, i32 %sub)
-  %mul = mul nsw i32 %call, %a
-  br label %for.inc
+; <label>:7                                       ; preds = %5
+  %8 = add nsw i32 %i.02, -1
+  %9 = tail call i32 @f(i32 %i.02, i32 %8)
+  %10 = mul nsw i32 %9, %a
+  br label %14
 
-if.else:                                          ; preds = %for.body
-  %add3 = add nsw i32 %i.021, 1
-  %call4 = tail call i32 @f(i32 %i.021, i32 %add3)
-  br label %for.inc
+; <label>:11                                      ; preds = %5
+  %12 = add nsw i32 %i.02, 1
+  %13 = tail call i32 @f(i32 %i.02, i32 %12)
+  br label %14
 
-for.inc:                                          ; preds = %if.then, %if.else
-  %mul.pn = phi i32 [ %mul, %if.then ], [ %call4, %if.else ]
-  %c.addr.1 = add nsw i32 %mul.pn, %c.addr.020
-  %inc = add nsw i32 %i.021, 1
-  %exitcond = icmp eq i32 %inc, %b
-  br i1 %exitcond, label %for.cond.cleanup, label %for.body
+; <label>:14                                      ; preds = %7, %11
+  %.pn = phi i32 [ %10, %7 ], [ %13, %11 ]
+  %.1 = add nsw i32 %.pn, %.01
+  %15 = add nsw i32 %i.02, 1
+  %exitcond = icmp eq i32 %15, %b
+  br i1 %exitcond, label %._crit_edge, label %5
 }
 
 ; Function Attrs: nounwind readnone uwtable
 define i32 @f(i32 %a, i32 %b) #2 {
-entry:
-  %div = sdiv i32 %a, %b
-  %rem = srem i32 %a, %b
-  %add = add nsw i32 %rem, %div
-  ret i32 %add
+  %1 = sdiv i32 %a, %b
+  %2 = srem i32 %a, %b
+  %3 = add nsw i32 %2, %1
+  ret i32 %3
 }
 
 ; Function Attrs: nounwind
@@ -87,4 +82,4 @@ attributes #3 = { nounwind }
 
 !llvm.ident = !{!0}
 
-!0 = !{!"clang version 3.7.1 (tags/RELEASE_371/final)"}
+!0 = !{!"Ubuntu clang version 3.7.1-2ubuntu2 (tags/RELEASE_371/final) (based on LLVM 3.7.1)"}

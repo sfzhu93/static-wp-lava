@@ -6,5 +6,5 @@ CXX_FLAGS = -g -fPIC   -fno-rtti -std=gnu++14
 
 CXX_DEFINES = -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -Dstatic_wp_lava_EXPORTS
 
-CXX_INCLUDES = -I/usr/local/include 
+CXX_INCLUDES = -I/usr/lib/llvm-3.7/include 
 

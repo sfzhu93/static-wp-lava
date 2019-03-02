@@ -1,0 +1,9 @@
+//
+// Created by zsf on 19-3-1.
+//
+
+#ifndef STATIC_WP_LAVA_INSHANDLER_H
+#define STATIC_WP_LAVA_INSHANDLER_H
+
+
+#endif //STATIC_WP_LAVA_INSHANDLER_H

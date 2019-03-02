@@ -6,13 +6,18 @@
 
 #include "llvm/Pass.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include "llvm/IR/Function.h"
+
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/Casting.h"
 #include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/CFG.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/ADT/SCCIterator.h"
 #include "llvm/ADT/PostOrderIterator.h"
-#include "llvm/IR/CFG.h"
+
 //#include <z3++.h>
 
 
@@ -49,6 +54,46 @@ namespace {
                         Instruction &instruction = *Ins;
                         instruction.print(outs());
                         outs()<<"\n";
+
+                        switch(instruction.getOpcode())
+                        {
+                            case Instruction::Call:
+                                auto *callInst = dyn_cast<CallInst>(&instruction);
+                                auto func = callInst->getCalledFunction();
+                                auto funcName = func->getName();
+                                outs()<<funcName<<"\n";
+                                if (funcName == "_wp_begin")
+                                {
+                                    //TODO: begin
+                                }else if (funcName == "_wp_end")
+                                {
+                                    //TODO: end
+                                }
+                                break;
+                            case Instruction::Ret:
+                            case Instruction::Br:
+                                break;
+                            case Instruction::Select:
+                                break;
+                            case Instruction::Add:
+                                break;
+                            case Instruction::Sub:
+                                break;
+                            case Instruction::Mul:
+                                break;
+                            case Instruction::UDiv:
+                                break;
+                            case Instruction::SDiv:
+                                break;
+                            case Instruction::URem:
+                            case Instruction::SRem:
+                            case Instruction::And:
+                            case Instruction::Or:
+                            case Instruction::Xor:
+                            case Instruction::ICmp:
+                            case Instruction::PHI:
+                                break;
+                        }
                         //instruction.dump();
                     }
                 }

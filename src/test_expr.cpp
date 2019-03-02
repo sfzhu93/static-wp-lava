@@ -16,6 +16,6 @@ Node::NodePtr test1()
 int main()
 {
 
-    std::cout<<test1()->ToString()<<std::endl;
+    std::cout<<test1()->ToString()<<std::endl;//should be ((1 + a) + (1 + 1))
     return 0;
 }

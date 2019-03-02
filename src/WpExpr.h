@@ -86,7 +86,7 @@ namespace WpExpr{
             return std::make_shared<Node>(CONST, std::move(std::make_shared<Node>()), std::move(std::make_shared<Node>()), std::move(value));
         }
 
-        static NodePtr substitute(NodePtr& src, std::string&& name, NodePtr expr){
+        static NodePtr substitute(NodePtr& src, const std::string& name, const NodePtr& expr){
             switch(src->type)
             {
                 case VAR:
@@ -102,11 +102,11 @@ namespace WpExpr{
                     //TODO: warning nothing substituted
                     break;
                 case UNIOP:
-                    substitute(src->left, std::move(name), expr);
+                    substitute(src->left, name, expr);
                     break;
                 case BINOP:
-                    substitute(src->left, std::move(name), expr);
-                    substitute(src->right, std::move(name), expr);
+                    substitute(src->left, name, expr);
+                    substitute(src->right, name, expr);
                     break;
             }
             return src;

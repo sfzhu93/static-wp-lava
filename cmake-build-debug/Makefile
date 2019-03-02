@@ -39,19 +39,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E remove -f
+RM = /home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/suz305/wp-study/static-wp-lava
+CMAKE_SOURCE_DIR = /home/zsf/wp-study/static-wp-lava
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/suz305/wp-study/static-wp-lava/cmake-build-debug
+CMAKE_BINARY_DIR = /home/zsf/wp-study/static-wp-lava/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -59,7 +59,7 @@ CMAKE_BINARY_DIR = /home/suz305/wp-study/static-wp-lava/cmake-build-debug
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -70,7 +70,7 @@ rebuild_cache/fast: rebuild_cache
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -123,6 +123,19 @@ static_wp_lava/fast:
 	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/build
 .PHONY : static_wp_lava/fast
 
+#=============================================================================
+# Target rules for targets named test_expr
+
+# Build rule for target.
+test_expr: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 test_expr
+.PHONY : test_expr
+
+# fast build rule for target.
+test_expr/fast:
+	$(MAKE) -f CMakeFiles/test_expr.dir/build.make CMakeFiles/test_expr.dir/build
+.PHONY : test_expr/fast
+
 src/MainPass.o: src/MainPass.cpp.o
 
 .PHONY : src/MainPass.o
@@ -157,6 +170,7 @@ src/WpExpr.o: src/WpExpr.cpp.o
 # target to build an object file
 src/WpExpr.cpp.o:
 	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o
+	$(MAKE) -f CMakeFiles/test_expr.dir/build.make CMakeFiles/test_expr.dir/src/WpExpr.cpp.o
 .PHONY : src/WpExpr.cpp.o
 
 src/WpExpr.i: src/WpExpr.cpp.i
@@ -166,6 +180,7 @@ src/WpExpr.i: src/WpExpr.cpp.i
 # target to preprocess a source file
 src/WpExpr.cpp.i:
 	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.i
+	$(MAKE) -f CMakeFiles/test_expr.dir/build.make CMakeFiles/test_expr.dir/src/WpExpr.cpp.i
 .PHONY : src/WpExpr.cpp.i
 
 src/WpExpr.s: src/WpExpr.cpp.s
@@ -175,6 +190,7 @@ src/WpExpr.s: src/WpExpr.cpp.s
 # target to generate assembly for a file
 src/WpExpr.cpp.s:
 	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.s
+	$(MAKE) -f CMakeFiles/test_expr.dir/build.make CMakeFiles/test_expr.dir/src/WpExpr.cpp.s
 .PHONY : src/WpExpr.cpp.s
 
 # Help Target
@@ -184,8 +200,9 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... static_wp_lava"
 	@echo "... edit_cache"
+	@echo "... static_wp_lava"
+	@echo "... test_expr"
 	@echo "... src/MainPass.o"
 	@echo "... src/MainPass.i"
 	@echo "... src/MainPass.s"
