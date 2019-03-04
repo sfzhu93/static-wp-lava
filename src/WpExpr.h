@@ -11,6 +11,8 @@ namespace WpExpr{
     enum NodeType {BINOP, UNIOP, VAR, CONST};
     enum Optr {PLUS, MINUS, AND, OR, NOT, MUL, DIV};
 
+    static const char *wp_init_var = "__wp_init_var";
+
     class Node : public std::enable_shared_from_this<Node> {
     public:
         NodeType type;
@@ -90,7 +92,7 @@ namespace WpExpr{
             switch(src->type)
             {
                 case VAR:
-                    if (src->name == name)
+                    if (src->name == name || src->name == WpExpr::wp_init_var)
                     {
                         src = expr;
                     }else
@@ -115,6 +117,8 @@ namespace WpExpr{
     private:
 
     };
+
+
 }
 
 
