@@ -10,6 +10,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/Module.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/CFG.h"
 #include "llvm/IR/Instruction.h"
@@ -110,11 +111,12 @@ namespace {
                     {0,"ICMP_SLE"}
             };*/
 
-    struct MainPass : public FunctionPass {
+    //ModulePass for interprocedural analysis
+    struct MainPass : public ModulePass {
         static char ID;
-        MainPass() : FunctionPass(ID) {}
+        MainPass() : ModulePass(ID) {}
         WpExpr::Node::NodePtr WP;
-        bool InWP;
+        bool InWP = false;
         std::unordered_map<std::uintptr_t, int> naming_map;
 
         int naming_index = 0;
@@ -175,140 +177,145 @@ namespace {
             return ret;
         }
 
-        bool runOnFunction(Function &F) override {
-            /*
-             * We Identify the SCCs of the BB graph, then topological sort these SCCs.
-             * Loop usually collapse into a single SCC.
-             */
-            outs()<<"In Function:"<<F.getName()<<"()\n";
-            //if(F.getName().compare("computeRecordScores")!=0)
-            //  return false;
+        bool runOnModule(Module &M) override {
+            for (Function &F : M) {
 
-            /*
-             * Iterate over Single Connected Component Basic Blocks(SCCs Basic Blocks)
-             */
-            for(scc_iterator<Function *> BB=scc_begin(&F),BBE=scc_end(&F); BB!=BBE;++BB){
-                //Since each SCC-BB can have multiple Basic Blocks
-                const std::vector<BasicBlock *> &SCCBBs=*BB;
-                //Iterate over SCCs Basic Block and in each BB traverse Instruction in reverse
-                for(std::vector<BasicBlock*>::const_iterator BBI = SCCBBs.begin();BBI!=SCCBBs.end();++BBI){
-                    outs()<<"In BB:"<<(*BBI)->getName()<<"\n";
-                    for(BasicBlock::reverse_iterator Ins=(*BBI)->rbegin();Ins!=(*BBI)->rend();++Ins){
-                        Instruction &instruction = *Ins;
-                        instruction.print(outs());
-                        outs()<<"\n";
-                        auto opcode = instruction.getOpcode();
-                        auto lhs = instruction.getName();
-                        outs()<<lhs<<"\n";
-                        if (opcode == Instruction::Call)
-                        {
-                            outs()<<"In Call Instruction\n";
-                            auto *callInst = dyn_cast<CallInst>(&instruction);
-                            auto func = callInst->getCalledFunction();
-                            auto funcName = func->getName();
-                            outs() << funcName << "\n";
-                            if (funcName == "_wp_begin") {
-                                outs()<<"_wp_begin\n";
-                                this->InWP = false;
-                                //TODO: solve the WP with z3
-                            } else if (funcName == "_wp_end") {
-                                this->InWP = true;
-                                this->WP = Node::CreateBinOp(Node::CreateVar(std::string(wp_init_var)),
-                                                             Node::CreateConst(std::string("1234567")),
-                                                             std::string("<"));
-                                outs()<<"debug-create-wp\n";
-                                //_init_var < magic number
+                /*
+                 * We Identify the SCCs of the BB graph, then topological sort these SCCs.
+                 * Loop usually collapse into a single SCC.
+                 */
+                outs() << "In Function:" << F.getName() << "()\n";
+                //if(F.getName().compare("computeRecordScores")!=0)
+                //  return false;
 
-                            } else if (funcName == "lava_get") {
-                                auto lhs_name = callInst->getName();
-                                auto aug = dyn_cast<Constant>(callInst->getArgOperand(0));
-                                auto num = aug->getUniqueInteger().getSExtValue();//TODO: may change to ZExt
-                                Node::substitute(this->WP,
-                                                 lhs_name,
-                                                 Node::CreateVar(buildLavaVarName(num)));
-                            } else if (funcName == "lava_set") {
-                                auto num = dyn_cast<Constant>(callInst->getArgOperand(0))->getUniqueInteger().getSExtValue();
-                                auto aug1 = callInst->getArgOperand(1);
-                                auto lava_val_node = this->HandleConstOrVar(aug1);
-                                Node::substitute(this->WP, buildLavaVarName(num), lava_val_node);
-                            }
-                        }else if (this->InWP) {
-                            outs()<<"InWP: ";
-                            switch (opcode) {
-                                case Instruction::Ret:
-                                    break;
-                                case Instruction::Br:
-                                    break;
-                                case Instruction::Select: {//from WP to (cond and WP[aug1/lhs] or not cond and WP[aug2/lhs])
-                                    auto selectins = cast<SelectInst>(&instruction);
-                                    auto cond = selectins->getOperand(0)->getName();
-                                    auto aug1 = this->HandleConstOrVar(selectins->getOperand(1));
-                                    auto aug2 = this->HandleConstOrVar(selectins->getOperand(2));
-                                    auto new_wp_left = std::make_shared<Node>(*this->WP);
-                                    auto new_wp_right = std::make_shared<Node>(*this->WP);
-                                    Node::substitute(new_wp_left, lhs, aug1);// WP-> WP[aug1/lhs]
-                                    Node::substitute(new_wp_right, lhs, aug2);//WP -> WP[aug2/lhs]
-                                    new_wp_left = Node::CreateBinOp(Node::CreateVar(cond),
-                                                                    std::move(new_wp_left),
-                                                                    std::string("AND"));
-                                    new_wp_right = Node::CreateBinOp(Node::CreateUniOp(
-                                            Node::CreateVar(cond),
-                                            std::string("NOT")),
-                                                                     std::move(new_wp_right),
-                                                                     std::string("AND"));
-                                    auto new_wp = Node::CreateBinOp(std::move(new_wp_left),
-                                                                    std::move(new_wp_right),
-                                                                    std::string("OR"));
-                                    this->WP = std::move(new_wp);
-                                    break;
-                                }
-                                case Instruction::Sub:
-                                case Instruction::Mul:
-                                case Instruction::UDiv:
-                                case Instruction::SDiv:
-                                case Instruction::URem:
-                                case Instruction::SRem:
-                                case Instruction::Add: {
-                                    outs()<<"debug0\n";
-                                    auto binins = cast<BinaryOperator>(&instruction);
-                                    outs()<<"debug1\n";
-                                    auto aug0 = this->HandleConstOrVar(binins->getOperand(0));
-                                    auto aug1 = this->HandleConstOrVar(binins->getOperand(1));
-                                    outs()<<"debug2\n";
-                                    auto op = std::string(opcode2Name(binins->getOpcode()));
-                                    Node::substitute(this->WP, lhs, Node::CreateBinOp(std::move(aug0), std::move(aug1),
-                                                                                      std::move(op)));
-                                    //outs()<<"Op0 Name: "<<instruction.getOperand(0)->getName()<<"\n";
-                                    break;
-                                }
-                                    /*case Instruction::And:
-                                    case Instruction::Or:
-                                    case Instruction::Xor:*/
-                                case Instruction::ICmp: //WP[(aug0 predicate aug1)/lhs]
-                                {
-                                    auto cmpins = cast<ICmpInst>(&instruction);
-                                    auto aug0 = HandleConstOrVar(cmpins->getOperand(0));
-                                    auto aug1 = HandleConstOrVar(cmpins->getOperand(1));
-                                    auto predicate = getPredicateName(cmpins->getUnsignedPredicate());
-                                    auto cond = Node::CreateBinOp(std::move(aug0), std::move(aug1),
-                                                                  std::string(predicate));
-                                    Node::substitute(this->WP, lhs, cond);
-                                    break;
-                                }
+                /*
+                 * Iterate over Single Connected Component Basic Blocks(SCCs Basic Blocks)
+                 */
+                for (scc_iterator<Function *> BB = scc_begin(&F), BBE = scc_end(&F); BB != BBE; ++BB) {
+                    //Since each SCC-BB can have multiple Basic Blocks
+                    const std::vector<BasicBlock *> &SCCBBs = *BB;
+                    //Iterate over SCCs Basic Block and in each BB traverse Instruction in reverse
+                    for (std::vector<BasicBlock *>::const_iterator BBI = SCCBBs.begin(); BBI != SCCBBs.end(); ++BBI) {
+                        outs() << "In BB:" << (*BBI)->getName() << "\n";
+                        for (BasicBlock::reverse_iterator Ins = (*BBI)->rbegin(); Ins != (*BBI)->rend(); ++Ins) {
+                            Instruction &instruction = *Ins;
+                            instruction.print(outs());
+                            outs() << "\n";
+                            auto opcode = instruction.getOpcode();
+                            auto lhs = instruction.getName();
+                            outs() << lhs << "\n";
+                            if (opcode == Instruction::Call) {
+                                outs() << "In Call Instruction\n";
+                                auto *callInst = dyn_cast<CallInst>(&instruction);
+                                auto func = callInst->getCalledFunction();
+                                auto funcName = func->getName();
+                                outs() << funcName << "\n";
+                                if (funcName == "_wp_begin") {
+                                    outs() << "_wp_begin\n";
+                                    this->InWP = false;
+                                    //TODO: solve the WP with z3
+                                } else if (funcName == "_wp_end") {
+                                    this->InWP = true;
+                                    this->WP = Node::CreateBinOp(Node::CreateVar(std::string(wp_init_var)),
+                                                                 Node::CreateConst(std::string("1234567")),
+                                                                 std::string("<"));
+                                    outs() << "debug-create-wp\n";
+                                    //_init_var < magic number
 
-                                case Instruction::PHI:
-                                    break;
-                                default:
-                                    break;
-                            }
-                            //instruction.dump();
+                                } else if (funcName == "lava_get") {
+                                    auto lhs_name = callInst->getName();
+                                    auto aug = dyn_cast<Constant>(callInst->getArgOperand(0));
+                                    auto num = aug->getUniqueInteger().getSExtValue();//TODO: may change to ZExt
+                                    Node::substitute(this->WP,
+                                                     lhs_name,
+                                                     Node::CreateVar(buildLavaVarName(num)));
+                                } else if (funcName == "lava_set") {
+                                    auto num = dyn_cast<Constant>(
+                                            callInst->getArgOperand(0))->getUniqueInteger().getSExtValue();
+                                    auto aug1 = callInst->getArgOperand(1);
+                                    auto lava_val_node = this->HandleConstOrVar(aug1);
+                                    Node::substitute(this->WP, buildLavaVarName(num), lava_val_node);
+                                }
+                            } else if (this->InWP) {
+                                outs() << "InWP: ";
+                                switch (opcode) {
+                                    case Instruction::Ret:
+                                        break;
+                                    case Instruction::Br:
+                                        break;
+                                    case Instruction::Select: {//from WP to (cond and WP[aug1/lhs] or not cond and WP[aug2/lhs])
+                                        auto selectins = cast<SelectInst>(&instruction);
+                                        auto cond = selectins->getOperand(0)->getName();
+                                        auto aug1 = this->HandleConstOrVar(selectins->getOperand(1));
+                                        auto aug2 = this->HandleConstOrVar(selectins->getOperand(2));
+                                        auto new_wp_left = std::make_shared<Node>(*this->WP);
+                                        auto new_wp_right = std::make_shared<Node>(*this->WP);
+                                        Node::substitute(new_wp_left, lhs, aug1);// WP-> WP[aug1/lhs]
+                                        Node::substitute(new_wp_right, lhs, aug2);//WP -> WP[aug2/lhs]
+                                        new_wp_left = Node::CreateBinOp(Node::CreateVar(cond),
+                                                                        std::move(new_wp_left),
+                                                                        std::string("AND"));
+                                        new_wp_right = Node::CreateBinOp(Node::CreateUniOp(
+                                                Node::CreateVar(cond),
+                                                std::string("NOT")),
+                                                                         std::move(new_wp_right),
+                                                                         std::string("AND"));
+                                        auto new_wp = Node::CreateBinOp(std::move(new_wp_left),
+                                                                        std::move(new_wp_right),
+                                                                        std::string("OR"));
+                                        this->WP = std::move(new_wp);
+                                        break;
+                                    }
+                                    case Instruction::Sub:
+                                    case Instruction::Mul:
+                                    case Instruction::UDiv:
+                                    case Instruction::SDiv:
+                                    case Instruction::URem:
+                                    case Instruction::SRem:
+                                    case Instruction::Add: {
+                                        outs() << "debug0\n";
+                                        auto binins = cast<BinaryOperator>(&instruction);
+                                        outs() << "debug1\n";
+                                        auto aug0 = this->HandleConstOrVar(binins->getOperand(0));
+                                        auto aug1 = this->HandleConstOrVar(binins->getOperand(1));
+                                        outs() << "debug2\n";
+                                        auto op = std::string(opcode2Name(binins->getOpcode()));
+                                        Node::substitute(this->WP, lhs,
+                                                         Node::CreateBinOp(std::move(aug0), std::move(aug1),
+                                                                           std::move(op)));
+                                        //outs()<<"Op0 Name: "<<instruction.getOperand(0)->getName()<<"\n";
+                                        break;
+                                    }
+                                        /*case Instruction::And:
+                                        case Instruction::Or:
+                                        case Instruction::Xor:*/
+                                    case Instruction::ICmp: //WP[(aug0 predicate aug1)/lhs]
+                                    {
+                                        auto cmpins = cast<ICmpInst>(&instruction);
+                                        auto aug0 = HandleConstOrVar(cmpins->getOperand(0));
+                                        auto aug1 = HandleConstOrVar(cmpins->getOperand(1));
+                                        auto predicate = getPredicateName(cmpins->getUnsignedPredicate());
+                                        auto cond = Node::CreateBinOp(std::move(aug0), std::move(aug1),
+                                                                      std::string(predicate));
+                                        Node::substitute(this->WP, lhs, cond);
+                                        break;
+                                    }
+
+                                    case Instruction::PHI:
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                //instruction.dump();
+                                outs()<<"WP ptr:"<< reinterpret_cast<uint64_t >(this->WP.get())<<"\n";
                                 outs() << "WP: " << this->WP->ToString() << "\n";
-                        }
+                            }
 
+                        }
                     }
                 }
             }
-            return true;
+            return false;
         }
     };
 }

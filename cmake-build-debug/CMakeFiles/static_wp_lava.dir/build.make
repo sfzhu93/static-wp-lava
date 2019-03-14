@@ -34,19 +34,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E remove -f
+RM = /home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/zsf/wp-study/static-wp-lava
+CMAKE_SOURCE_DIR = /home/suz305/wp-study/static-wp-lava
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/zsf/wp-study/static-wp-lava/cmake-build-debug
+CMAKE_BINARY_DIR = /home/suz305/wp-study/static-wp-lava/cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/static_wp_lava.dir/depend.make
@@ -59,43 +59,58 @@ include CMakeFiles/static_wp_lava.dir/flags.make
 
 CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o: CMakeFiles/static_wp_lava.dir/flags.make
 CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o: ../src/MainPass.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o -c /home/zsf/wp-study/static-wp-lava/src/MainPass.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o -c /home/suz305/wp-study/static-wp-lava/src/MainPass.cpp
 
 CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/zsf/wp-study/static-wp-lava/src/MainPass.cpp > CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/suz305/wp-study/static-wp-lava/src/MainPass.cpp > CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.i
 
 CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zsf/wp-study/static-wp-lava/src/MainPass.cpp -o CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suz305/wp-study/static-wp-lava/src/MainPass.cpp -o CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.s
 
 CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o: CMakeFiles/static_wp_lava.dir/flags.make
 CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o: ../src/WpExpr.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o -c /home/zsf/wp-study/static-wp-lava/src/WpExpr.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o -c /home/suz305/wp-study/static-wp-lava/src/WpExpr.cpp
 
 CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/zsf/wp-study/static-wp-lava/src/WpExpr.cpp > CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/suz305/wp-study/static-wp-lava/src/WpExpr.cpp > CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.i
 
 CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zsf/wp-study/static-wp-lava/src/WpExpr.cpp -o CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suz305/wp-study/static-wp-lava/src/WpExpr.cpp -o CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.s
+
+CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.o: CMakeFiles/static_wp_lava.dir/flags.make
+CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.o: ../src/InsHandler.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.o -c /home/suz305/wp-study/static-wp-lava/src/InsHandler.cpp
+
+CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/suz305/wp-study/static-wp-lava/src/InsHandler.cpp > CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.i
+
+CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/suz305/wp-study/static-wp-lava/src/InsHandler.cpp -o CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.s
 
 # Object files for target static_wp_lava
 static_wp_lava_OBJECTS = \
 "CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o" \
-"CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o"
+"CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o" \
+"CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.o"
 
 # External object files for target static_wp_lava
 static_wp_lava_EXTERNAL_OBJECTS =
 
 libstatic_wp_lava.so: CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o
 libstatic_wp_lava.so: CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o
+libstatic_wp_lava.so: CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.o
 libstatic_wp_lava.so: CMakeFiles/static_wp_lava.dir/build.make
 libstatic_wp_lava.so: CMakeFiles/static_wp_lava.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX shared library libstatic_wp_lava.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX shared library libstatic_wp_lava.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/static_wp_lava.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -108,6 +123,6 @@ CMakeFiles/static_wp_lava.dir/clean:
 .PHONY : CMakeFiles/static_wp_lava.dir/clean
 
 CMakeFiles/static_wp_lava.dir/depend:
-	cd /home/zsf/wp-study/static-wp-lava/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/zsf/wp-study/static-wp-lava /home/zsf/wp-study/static-wp-lava /home/zsf/wp-study/static-wp-lava/cmake-build-debug /home/zsf/wp-study/static-wp-lava/cmake-build-debug /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/static_wp_lava.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/suz305/wp-study/static-wp-lava/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/suz305/wp-study/static-wp-lava /home/suz305/wp-study/static-wp-lava /home/suz305/wp-study/static-wp-lava/cmake-build-debug /home/suz305/wp-study/static-wp-lava/cmake-build-debug /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/static_wp_lava.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/static_wp_lava.dir/depend
 

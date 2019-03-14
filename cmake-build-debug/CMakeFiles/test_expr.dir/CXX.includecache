@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/suz305/wp-study/static-wp-lava/src/WpExpr.cpp
+WpExpr.h
+/home/suz305/wp-study/static-wp-lava/src/WpExpr.h
+
+/home/suz305/wp-study/static-wp-lava/src/WpExpr.h
+memory
+-
+
+/home/suz305/wp-study/static-wp-lava/src/test_expr.cpp
+iostream
+-
+WpExpr.h
+/home/suz305/wp-study/static-wp-lava/src/WpExpr.h
+

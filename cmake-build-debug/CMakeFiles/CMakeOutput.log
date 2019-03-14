@@ -1,4 +1,4 @@
-The system is: Linux - 4.15.0-45-generic - x86_64
+The system is: Linux - 4.15.0-34-generic - x86_64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
 Compiler: /usr/bin/cc 
 Build flags: 
@@ -10,7 +10,7 @@ The output was:
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
 
-The C compiler identification is GNU, found in "/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/3.13.2/CompilerIdC/a.out"
+The C compiler identification is GNU, found in "/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/3.13.2/CompilerIdC/a.out"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler: /usr/bin/c++ 
@@ -23,33 +23,33 @@ The output was:
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
 
-The CXX compiler identification is GNU, found in "/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/3.13.2/CompilerIdCXX/a.out"
+The CXX compiler identification is GNU, found in "/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/3.13.2/CompilerIdCXX/a.out"
 
 Determining if the C compiler works passed with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_b75bf/fast"
-/usr/bin/make -f CMakeFiles/cmTC_b75bf.dir/build.make CMakeFiles/cmTC_b75bf.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_b75bf.dir/testCCompiler.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_b75bf.dir/testCCompiler.c.o   -c /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_b75bf
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b75bf.dir/link.txt --verbose=1
-/usr/bin/cc      CMakeFiles/cmTC_b75bf.dir/testCCompiler.c.o  -o cmTC_b75bf 
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_dd822/fast"
+/usr/bin/make -f CMakeFiles/cmTC_dd822.dir/build.make CMakeFiles/cmTC_dd822.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_dd822.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_dd822.dir/testCCompiler.c.o   -c /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_dd822
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_dd822.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_dd822.dir/testCCompiler.c.o  -o cmTC_dd822 
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
 Detecting C compiler ABI info compiled with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_66638/fast"
-/usr/bin/make -f CMakeFiles/cmTC_66638.dir/build.make CMakeFiles/cmTC_66638.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_66638.dir/CMakeCCompilerABI.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_66638.dir/CMakeCCompilerABI.c.o   -c /home/zsf/clion-2018.3.4/bin/cmake/linux/share/cmake-3.13/Modules/CMakeCCompilerABI.c
-Linking C executable cmTC_66638
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_66638.dir/link.txt --verbose=1
-/usr/bin/cc     -v CMakeFiles/cmTC_66638.dir/CMakeCCompilerABI.c.o  -o cmTC_66638 
+Run Build Command:"/usr/bin/make" "cmTC_aa740/fast"
+/usr/bin/make -f CMakeFiles/cmTC_aa740.dir/build.make CMakeFiles/cmTC_aa740.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_aa740.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_aa740.dir/CMakeCCompilerABI.c.o   -c /home/suz305/clion-2018.3.4/bin/cmake/linux/share/cmake-3.13/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_aa740
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aa740.dir/link.txt --verbose=1
+/usr/bin/cc     -v CMakeFiles/cmTC_aa740.dir/CMakeCCompilerABI.c.o  -o cmTC_aa740 
 Using built-in specs.
 COLLECT_GCC=/usr/bin/cc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
@@ -59,23 +59,23 @@ Thread model: posix
 gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_66638' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cckmtyv8.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_66638 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_66638.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_aa740' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbdMueZ.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_aa740 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_aa740.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
 Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_66638/fast"]
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_66638.dir/build.make CMakeFiles/cmTC_66638.dir/build]
-  ignore line: [make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_66638.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_66638.dir/CMakeCCompilerABI.c.o   -c /home/zsf/clion-2018.3.4/bin/cmake/linux/share/cmake-3.13/Modules/CMakeCCompilerABI.c]
-  ignore line: [Linking C executable cmTC_66638]
-  ignore line: [/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_66638.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/cc     -v CMakeFiles/cmTC_66638.dir/CMakeCCompilerABI.c.o  -o cmTC_66638 ]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_aa740/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_aa740.dir/build.make CMakeFiles/cmTC_aa740.dir/build]
+  ignore line: [make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_aa740.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_aa740.dir/CMakeCCompilerABI.c.o   -c /home/suz305/clion-2018.3.4/bin/cmake/linux/share/cmake-3.13/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_aa740]
+  ignore line: [/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aa740.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v CMakeFiles/cmTC_aa740.dir/CMakeCCompilerABI.c.o  -o cmTC_aa740 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/cc]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
@@ -85,13 +85,13 @@ Parsed C implicit link information from above output:
   ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_66638' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cckmtyv8.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_66638 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_66638.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_aa740' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbdMueZ.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_aa740 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_aa740.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/cckmtyv8.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccbdMueZ.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -108,7 +108,7 @@ Parsed C implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_66638] ==> ignore
+    arg [cmTC_aa740] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
@@ -120,7 +120,7 @@ Parsed C implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
-    arg [CMakeFiles/cmTC_66638.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_aa740.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lgcc] ==> lib [gcc]
     arg [--as-needed] ==> ignore
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -148,17 +148,17 @@ Parsed C implicit link information from above output:
 
 
 Detecting C [-std=c11] compiler features compiled with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_a69ec/fast"
-/usr/bin/make -f CMakeFiles/cmTC_a69ec.dir/build.make CMakeFiles/cmTC_a69ec.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_a69ec.dir/feature_tests.c.o
-/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_a69ec.dir/feature_tests.c.o   -c /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.c
-Linking C executable cmTC_a69ec
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a69ec.dir/link.txt --verbose=1
-/usr/bin/cc      CMakeFiles/cmTC_a69ec.dir/feature_tests.c.o  -o cmTC_a69ec 
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_42df7/fast"
+/usr/bin/make -f CMakeFiles/cmTC_42df7.dir/build.make CMakeFiles/cmTC_42df7.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_42df7.dir/feature_tests.c.o
+/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_42df7.dir/feature_tests.c.o   -c /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.c
+Linking C executable cmTC_42df7
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_42df7.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_42df7.dir/feature_tests.c.o  -o cmTC_42df7 
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -168,17 +168,17 @@ make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/
 
 
 Detecting C [-std=c99] compiler features compiled with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_d6bfb/fast"
-/usr/bin/make -f CMakeFiles/cmTC_d6bfb.dir/build.make CMakeFiles/cmTC_d6bfb.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_d6bfb.dir/feature_tests.c.o
-/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_d6bfb.dir/feature_tests.c.o   -c /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.c
-Linking C executable cmTC_d6bfb
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d6bfb.dir/link.txt --verbose=1
-/usr/bin/cc      CMakeFiles/cmTC_d6bfb.dir/feature_tests.c.o  -o cmTC_d6bfb 
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_24508/fast"
+/usr/bin/make -f CMakeFiles/cmTC_24508.dir/build.make CMakeFiles/cmTC_24508.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_24508.dir/feature_tests.c.o
+/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_24508.dir/feature_tests.c.o   -c /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.c
+Linking C executable cmTC_24508
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_24508.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_24508.dir/feature_tests.c.o  -o cmTC_24508 
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -188,17 +188,17 @@ make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/
 
 
 Detecting C [-std=c90] compiler features compiled with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_aef34/fast"
-/usr/bin/make -f CMakeFiles/cmTC_aef34.dir/build.make CMakeFiles/cmTC_aef34.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_aef34.dir/feature_tests.c.o
-/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_aef34.dir/feature_tests.c.o   -c /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.c
-Linking C executable cmTC_aef34
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aef34.dir/link.txt --verbose=1
-/usr/bin/cc      CMakeFiles/cmTC_aef34.dir/feature_tests.c.o  -o cmTC_aef34 
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_43336/fast"
+/usr/bin/make -f CMakeFiles/cmTC_43336.dir/build.make CMakeFiles/cmTC_43336.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_43336.dir/feature_tests.c.o
+/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_43336.dir/feature_tests.c.o   -c /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.c
+Linking C executable cmTC_43336
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_43336.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_43336.dir/feature_tests.c.o  -o cmTC_43336 
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -206,30 +206,30 @@ make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/
     Feature record: C_FEATURE:0c_static_assert
     Feature record: C_FEATURE:0c_variadic_macros
 Determining if the CXX compiler works passed with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_d2e4a/fast"
-/usr/bin/make -f CMakeFiles/cmTC_d2e4a.dir/build.make CMakeFiles/cmTC_d2e4a.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_d2e4a.dir/testCXXCompiler.cxx.o
-/usr/bin/c++     -o CMakeFiles/cmTC_d2e4a.dir/testCXXCompiler.cxx.o -c /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-Linking CXX executable cmTC_d2e4a
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d2e4a.dir/link.txt --verbose=1
-/usr/bin/c++       CMakeFiles/cmTC_d2e4a.dir/testCXXCompiler.cxx.o  -o cmTC_d2e4a 
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_757c2/fast"
+/usr/bin/make -f CMakeFiles/cmTC_757c2.dir/build.make CMakeFiles/cmTC_757c2.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_757c2.dir/testCXXCompiler.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTC_757c2.dir/testCXXCompiler.cxx.o -c /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_757c2
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_757c2.dir/link.txt --verbose=1
+/usr/bin/c++       CMakeFiles/cmTC_757c2.dir/testCXXCompiler.cxx.o  -o cmTC_757c2 
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX compiler ABI info compiled with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_75415/fast"
-/usr/bin/make -f CMakeFiles/cmTC_75415.dir/build.make CMakeFiles/cmTC_75415.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_75415.dir/CMakeCXXCompilerABI.cpp.o
-/usr/bin/c++     -o CMakeFiles/cmTC_75415.dir/CMakeCXXCompilerABI.cpp.o -c /home/zsf/clion-2018.3.4/bin/cmake/linux/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp
-Linking CXX executable cmTC_75415
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_75415.dir/link.txt --verbose=1
-/usr/bin/c++      -v CMakeFiles/cmTC_75415.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_75415 
+Run Build Command:"/usr/bin/make" "cmTC_d3050/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d3050.dir/build.make CMakeFiles/cmTC_d3050.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_d3050.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++     -o CMakeFiles/cmTC_d3050.dir/CMakeCXXCompilerABI.cpp.o -c /home/suz305/clion-2018.3.4/bin/cmake/linux/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_d3050
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d3050.dir/link.txt --verbose=1
+/usr/bin/c++      -v CMakeFiles/cmTC_d3050.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_d3050 
 Using built-in specs.
 COLLECT_GCC=/usr/bin/c++
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
@@ -239,23 +239,23 @@ Thread model: posix
 gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_75415' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cchlpQpq.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_75415 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_75415.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_d3050' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbqE593.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_d3050 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_d3050.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
 Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_75415/fast"]
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_75415.dir/build.make CMakeFiles/cmTC_75415.dir/build]
-  ignore line: [make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp']
-  ignore line: [Building CXX object CMakeFiles/cmTC_75415.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTC_75415.dir/CMakeCXXCompilerABI.cpp.o -c /home/zsf/clion-2018.3.4/bin/cmake/linux/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp]
-  ignore line: [Linking CXX executable cmTC_75415]
-  ignore line: [/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_75415.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/c++      -v CMakeFiles/cmTC_75415.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_75415 ]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_d3050/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_d3050.dir/build.make CMakeFiles/cmTC_d3050.dir/build]
+  ignore line: [make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_d3050.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTC_d3050.dir/CMakeCXXCompilerABI.cpp.o -c /home/suz305/clion-2018.3.4/bin/cmake/linux/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_d3050]
+  ignore line: [/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d3050.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++      -v CMakeFiles/cmTC_d3050.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_d3050 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/c++]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
@@ -265,13 +265,13 @@ Parsed CXX implicit link information from above output:
   ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.11) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_75415' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cchlpQpq.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_75415 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_75415.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_d3050' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbqE593.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_d3050 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_d3050.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/cchlpQpq.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccbqE593.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -288,7 +288,7 @@ Parsed CXX implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_75415] ==> ignore
+    arg [cmTC_d3050] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
@@ -300,7 +300,7 @@ Parsed CXX implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
-    arg [CMakeFiles/cmTC_75415.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTC_d3050.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lstdc++] ==> lib [stdc++]
     arg [-lm] ==> lib [m]
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -326,17 +326,17 @@ Parsed CXX implicit link information from above output:
 
 
 Detecting CXX [-std=c++1z] compiler features compiled with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_30960/fast"
-/usr/bin/make -f CMakeFiles/cmTC_30960.dir/build.make CMakeFiles/cmTC_30960.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_30960.dir/feature_tests.cxx.o
-/usr/bin/c++    -std=c++1z -o CMakeFiles/cmTC_30960.dir/feature_tests.cxx.o -c /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_30960
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_30960.dir/link.txt --verbose=1
-/usr/bin/c++       CMakeFiles/cmTC_30960.dir/feature_tests.cxx.o  -o cmTC_30960 
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_2c04c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_2c04c.dir/build.make CMakeFiles/cmTC_2c04c.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_2c04c.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++1z -o CMakeFiles/cmTC_2c04c.dir/feature_tests.cxx.o -c /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_2c04c
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2c04c.dir/link.txt --verbose=1
+/usr/bin/c++       CMakeFiles/cmTC_2c04c.dir/feature_tests.cxx.o  -o cmTC_2c04c 
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -399,17 +399,17 @@ make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/
 
 
 Detecting CXX [-std=c++14] compiler features compiled with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_79731/fast"
-/usr/bin/make -f CMakeFiles/cmTC_79731.dir/build.make CMakeFiles/cmTC_79731.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_79731.dir/feature_tests.cxx.o
-/usr/bin/c++    -std=c++14 -o CMakeFiles/cmTC_79731.dir/feature_tests.cxx.o -c /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_79731
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_79731.dir/link.txt --verbose=1
-/usr/bin/c++       CMakeFiles/cmTC_79731.dir/feature_tests.cxx.o  -o cmTC_79731 
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_6a6b7/fast"
+/usr/bin/make -f CMakeFiles/cmTC_6a6b7.dir/build.make CMakeFiles/cmTC_6a6b7.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_6a6b7.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++14 -o CMakeFiles/cmTC_6a6b7.dir/feature_tests.cxx.o -c /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_6a6b7
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6a6b7.dir/link.txt --verbose=1
+/usr/bin/c++       CMakeFiles/cmTC_6a6b7.dir/feature_tests.cxx.o  -o cmTC_6a6b7 
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -472,17 +472,17 @@ make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/
 
 
 Detecting CXX [-std=c++11] compiler features compiled with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_5730a/fast"
-/usr/bin/make -f CMakeFiles/cmTC_5730a.dir/build.make CMakeFiles/cmTC_5730a.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_5730a.dir/feature_tests.cxx.o
-/usr/bin/c++    -std=c++11 -o CMakeFiles/cmTC_5730a.dir/feature_tests.cxx.o -c /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_5730a
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5730a.dir/link.txt --verbose=1
-/usr/bin/c++       CMakeFiles/cmTC_5730a.dir/feature_tests.cxx.o  -o cmTC_5730a 
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_f3335/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f3335.dir/build.make CMakeFiles/cmTC_f3335.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_f3335.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++11 -o CMakeFiles/cmTC_f3335.dir/feature_tests.cxx.o -c /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_f3335
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f3335.dir/link.txt --verbose=1
+/usr/bin/c++       CMakeFiles/cmTC_f3335.dir/feature_tests.cxx.o  -o cmTC_f3335 
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
@@ -545,17 +545,17 @@ make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/
 
 
 Detecting CXX [-std=c++98] compiler features compiled with the following output:
-Change Dir: /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_62c01/fast"
-/usr/bin/make -f CMakeFiles/cmTC_62c01.dir/build.make CMakeFiles/cmTC_62c01.dir/build
-make[1]: Entering directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_62c01.dir/feature_tests.cxx.o
-/usr/bin/c++    -std=c++98 -o CMakeFiles/cmTC_62c01.dir/feature_tests.cxx.o -c /home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_62c01
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_62c01.dir/link.txt --verbose=1
-/usr/bin/c++       CMakeFiles/cmTC_62c01.dir/feature_tests.cxx.o  -o cmTC_62c01 
-make[1]: Leaving directory '/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_d62ef/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d62ef.dir/build.make CMakeFiles/cmTC_d62ef.dir/build
+make[1]: Entering directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_d62ef.dir/feature_tests.cxx.o
+/usr/bin/c++    -std=c++98 -o CMakeFiles/cmTC_d62ef.dir/feature_tests.cxx.o -c /home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_d62ef
+/home/suz305/clion-2018.3.4/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d62ef.dir/link.txt --verbose=1
+/usr/bin/c++       CMakeFiles/cmTC_d62ef.dir/feature_tests.cxx.o  -o cmTC_d62ef 
+make[1]: Leaving directory '/home/suz305/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
