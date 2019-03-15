@@ -157,20 +157,16 @@ namespace {
             if(auto c = dyn_cast<Constant>(value))
             {
                 if (c->getType()->isIntegerTy()) {
-                    outs() << "const or var: 0\n";
                     ret = Node::CreateConst(
                             std::to_string(c->getUniqueInteger().getSExtValue()));//TODO: may change to ZExt
                 }
                 else
                 {
-                    outs() << "const or var: 1\n";
                     ret = std::make_shared<Node>();//TODO: not implemented!
                 }
             }else
             {
-                outs() << "const or var: 2\n";
                 ret = Node::CreateVar(value->getName());//TODO: would move fuck up here?
-                outs() << "const or var: 2 end\n";
             }
             return ret;
         }
@@ -199,16 +195,16 @@ namespace {
                         outs()<<"\n";
                         auto opcode = instruction.getOpcode();
                         auto lhs = instruction.getName();
-                        outs()<<lhs<<"\n";
+                        //outs()<<lhs<<"\n";
                         if (opcode == Instruction::Call)
                         {
-                            outs()<<"In Call Instruction\n";
+                            //outs()<<"In Call Instruction\n";
                             auto *callInst = dyn_cast<CallInst>(&instruction);
                             auto func = callInst->getCalledFunction();
                             auto funcName = func->getName();
-                            outs() << funcName << "\n";
+                            //outs() << funcName << "\n";
                             if (funcName == "_wp_begin") {
-                                outs()<<"_wp_begin\n";
+                                //outs()<<"_wp_begin\n";
                                 this->InWP = false;
                                 //TODO: solve the WP with z3
                             } else if (funcName == "_wp_end") {
@@ -216,7 +212,7 @@ namespace {
                                 this->WP = Node::CreateBinOp(Node::CreateVar(std::string(wp_init_var)),
                                                              Node::CreateConst(std::string("1234567")),
                                                              std::string("<"));
-                                outs()<<"debug-create-wp\n";
+                                //outs()<<"debug-create-wp\n";
                                 //_init_var < magic number
 
                             } else if (funcName == "lava_get") {
@@ -233,7 +229,7 @@ namespace {
                                 Node::substitute(this->WP, buildLavaVarName(num), lava_val_node);
                             }
                         }else if (this->InWP) {
-                            outs()<<"InWP: ";
+                            //outs()<<"InWP: ";
                             switch (opcode) {
                                 case Instruction::Ret:
                                     break;
@@ -269,12 +265,12 @@ namespace {
                                 case Instruction::URem:
                                 case Instruction::SRem:
                                 case Instruction::Add: {
-                                    outs()<<"debug0\n";
+                                    //outs()<<"debug0\n";
                                     auto binins = cast<BinaryOperator>(&instruction);
-                                    outs()<<"debug1\n";
+                                    //outs()<<"debug1\n";
                                     auto aug0 = this->HandleConstOrVar(binins->getOperand(0));
                                     auto aug1 = this->HandleConstOrVar(binins->getOperand(1));
-                                    outs()<<"debug2\n";
+                                    //outs()<<"debug2\n";
                                     auto op = std::string(opcode2Name(binins->getOpcode()));
                                     Node::substitute(this->WP, lhs, Node::CreateBinOp(std::move(aug0), std::move(aug1),
                                                                                       std::move(op)));
