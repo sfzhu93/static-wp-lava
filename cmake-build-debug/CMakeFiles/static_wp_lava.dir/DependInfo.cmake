@@ -4,6 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/zsf/wp-study/static-wp-lava/src/InsHandler.cpp" "/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.o"
   "/home/zsf/wp-study/static-wp-lava/src/MainPass.cpp" "/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/static_wp_lava.dir/src/MainPass.cpp.o"
   "/home/zsf/wp-study/static-wp-lava/src/WpExpr.cpp" "/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/static_wp_lava.dir/src/WpExpr.cpp.o"
   )
@@ -17,7 +18,7 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/usr/lib/llvm-3.7/include"
+  "/usr/local/include"
   )
 
 # Targets to which this target links.

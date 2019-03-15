@@ -136,6 +136,33 @@ test_expr/fast:
 	$(MAKE) -f CMakeFiles/test_expr.dir/build.make CMakeFiles/test_expr.dir/build
 .PHONY : test_expr/fast
 
+src/InsHandler.o: src/InsHandler.cpp.o
+
+.PHONY : src/InsHandler.o
+
+# target to build an object file
+src/InsHandler.cpp.o:
+	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.o
+.PHONY : src/InsHandler.cpp.o
+
+src/InsHandler.i: src/InsHandler.cpp.i
+
+.PHONY : src/InsHandler.i
+
+# target to preprocess a source file
+src/InsHandler.cpp.i:
+	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.i
+.PHONY : src/InsHandler.cpp.i
+
+src/InsHandler.s: src/InsHandler.cpp.s
+
+.PHONY : src/InsHandler.s
+
+# target to generate assembly for a file
+src/InsHandler.cpp.s:
+	$(MAKE) -f CMakeFiles/static_wp_lava.dir/build.make CMakeFiles/static_wp_lava.dir/src/InsHandler.cpp.s
+.PHONY : src/InsHandler.cpp.s
+
 src/MainPass.o: src/MainPass.cpp.o
 
 .PHONY : src/MainPass.o
@@ -193,6 +220,33 @@ src/WpExpr.cpp.s:
 	$(MAKE) -f CMakeFiles/test_expr.dir/build.make CMakeFiles/test_expr.dir/src/WpExpr.cpp.s
 .PHONY : src/WpExpr.cpp.s
 
+src/test_expr.o: src/test_expr.cpp.o
+
+.PHONY : src/test_expr.o
+
+# target to build an object file
+src/test_expr.cpp.o:
+	$(MAKE) -f CMakeFiles/test_expr.dir/build.make CMakeFiles/test_expr.dir/src/test_expr.cpp.o
+.PHONY : src/test_expr.cpp.o
+
+src/test_expr.i: src/test_expr.cpp.i
+
+.PHONY : src/test_expr.i
+
+# target to preprocess a source file
+src/test_expr.cpp.i:
+	$(MAKE) -f CMakeFiles/test_expr.dir/build.make CMakeFiles/test_expr.dir/src/test_expr.cpp.i
+.PHONY : src/test_expr.cpp.i
+
+src/test_expr.s: src/test_expr.cpp.s
+
+.PHONY : src/test_expr.s
+
+# target to generate assembly for a file
+src/test_expr.cpp.s:
+	$(MAKE) -f CMakeFiles/test_expr.dir/build.make CMakeFiles/test_expr.dir/src/test_expr.cpp.s
+.PHONY : src/test_expr.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -203,12 +257,18 @@ help:
 	@echo "... edit_cache"
 	@echo "... static_wp_lava"
 	@echo "... test_expr"
+	@echo "... src/InsHandler.o"
+	@echo "... src/InsHandler.i"
+	@echo "... src/InsHandler.s"
 	@echo "... src/MainPass.o"
 	@echo "... src/MainPass.i"
 	@echo "... src/MainPass.s"
 	@echo "... src/WpExpr.o"
 	@echo "... src/WpExpr.i"
 	@echo "... src/WpExpr.s"
+	@echo "... src/test_expr.o"
+	@echo "... src/test_expr.i"
+	@echo "... src/test_expr.s"
 .PHONY : help
 
 

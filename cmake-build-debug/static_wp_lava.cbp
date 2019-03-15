@@ -5,7 +5,7 @@
 		<Option title="static_wp_lava"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="gcc"/>
-		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\usr\;CMake Files\..\..\..\..\usr\share\;CMake Files\..\..\..\..\usr\share\llvm-3.7\;CMake Files\..\..\..\..\usr\share\llvm-3.7\cmake\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\usr\;CMake Files\..\..\..\..\usr\local\;CMake Files\..\..\..\..\usr\local\share\;CMake Files\..\..\..\..\usr\local\share\llvm\;CMake Files\..\..\..\..\usr\local\share\llvm\cmake\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/home/zsf/wp-study/static-wp-lava/cmake-build-debug"/>
@@ -46,12 +46,11 @@
 				<Compiler>
 					<Add option="-D__STDC_LIMIT_MACROS"/>
 					<Add option="-D__STDC_CONSTANT_MACROS"/>
-					<Add directory="/usr/lib/llvm-3.7/include"/>
+					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/include/c++/5"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
 					<Add directory="/usr/include/c++/5/backward"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
-					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
 					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
@@ -72,12 +71,11 @@
 				<Compiler>
 					<Add option="-D__STDC_LIMIT_MACROS"/>
 					<Add option="-D__STDC_CONSTANT_MACROS"/>
-					<Add directory="/usr/lib/llvm-3.7/include"/>
+					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/include/c++/5"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
 					<Add directory="/usr/include/c++/5/backward"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
-					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
 					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
@@ -98,12 +96,11 @@
 				<Compiler>
 					<Add option="-D__STDC_LIMIT_MACROS"/>
 					<Add option="-D__STDC_CONSTANT_MACROS"/>
-					<Add directory="/usr/lib/llvm-3.7/include"/>
+					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/include/c++/5"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
 					<Add directory="/usr/include/c++/5/backward"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
-					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
 					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
@@ -124,12 +121,11 @@
 				<Compiler>
 					<Add option="-D__STDC_LIMIT_MACROS"/>
 					<Add option="-D__STDC_CONSTANT_MACROS"/>
-					<Add directory="/usr/lib/llvm-3.7/include"/>
+					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/include/c++/5"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
 					<Add directory="/usr/include/c++/5/backward"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
-					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
 					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
@@ -142,6 +138,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/zsf/wp-study/static-wp-lava/src/InsHandler.cpp">
+			<Option target="static_wp_lava"/>
+		</Unit>
+		<Unit filename="/home/zsf/wp-study/static-wp-lava/src/InsHandler.h">
+			<Option target="static_wp_lava"/>
+		</Unit>
 		<Unit filename="/home/zsf/wp-study/static-wp-lava/src/MainPass.cpp">
 			<Option target="static_wp_lava"/>
 		</Unit>
@@ -156,20 +158,26 @@
 			<Option target="static_wp_lava"/>
 			<Option target="test_expr"/>
 		</Unit>
+		<Unit filename="/home/zsf/wp-study/static-wp-lava/src/test_expr.cpp">
+			<Option target="test_expr"/>
+		</Unit>
 		<Unit filename="/home/zsf/wp-study/static-wp-lava/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
-		<Unit filename="/home/zsf/wp-study/static-wp-lava/../../../../usr/share/llvm-3.7/cmake/LLVM-Config.cmake">
-			<Option virtualFolder="CMake Files\..\..\..\..\usr\share\llvm-3.7\cmake\"/>
+		<Unit filename="/home/zsf/wp-study/static-wp-lava/../../../../usr/local/share/llvm/cmake/LLVM-Config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\share\llvm\cmake\"/>
 		</Unit>
-		<Unit filename="/home/zsf/wp-study/static-wp-lava/../../../../usr/share/llvm-3.7/cmake/LLVMConfig.cmake">
-			<Option virtualFolder="CMake Files\..\..\..\..\usr\share\llvm-3.7\cmake\"/>
+		<Unit filename="/home/zsf/wp-study/static-wp-lava/../../../../usr/local/share/llvm/cmake/LLVMConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\share\llvm\cmake\"/>
 		</Unit>
-		<Unit filename="/home/zsf/wp-study/static-wp-lava/../../../../usr/share/llvm-3.7/cmake/LLVMConfigVersion.cmake">
-			<Option virtualFolder="CMake Files\..\..\..\..\usr\share\llvm-3.7\cmake\"/>
+		<Unit filename="/home/zsf/wp-study/static-wp-lava/../../../../usr/local/share/llvm/cmake/LLVMConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\share\llvm\cmake\"/>
 		</Unit>
-		<Unit filename="/home/zsf/wp-study/static-wp-lava/../../../../usr/share/llvm-3.7/cmake/LLVMExports.cmake">
-			<Option virtualFolder="CMake Files\..\..\..\..\usr\share\llvm-3.7\cmake\"/>
+		<Unit filename="/home/zsf/wp-study/static-wp-lava/../../../../usr/local/share/llvm/cmake/LLVMExports-noconfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\share\llvm\cmake\"/>
+		</Unit>
+		<Unit filename="/home/zsf/wp-study/static-wp-lava/../../../../usr/local/share/llvm/cmake/LLVMExports.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\share\llvm\cmake\"/>
 		</Unit>
 	</Project>
 </CodeBlocks_project_file>
