@@ -1,4 +1,0 @@
-/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/static_wp_lava.dir
-/home/zsf/wp-study/static-wp-lava/cmake-build-debug/CMakeFiles/test_expr.dir
