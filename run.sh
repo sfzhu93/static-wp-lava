@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-SAMPLE=lava1
+#SAMPLE=lava1
+SAMPLE=branch
 #LLVM_VERSION_ATTR=-3.7
 LLVM_VERSION_ATTR=""
 #BUILD_DIR=cmake-build-debug-llvm-37

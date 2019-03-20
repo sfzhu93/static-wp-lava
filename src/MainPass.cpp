@@ -21,6 +21,7 @@
 #include "llvm/ADT/PostOrderIterator.h"
 
 #include "WpExpr.h"
+#include "Miscs.h"
 //#include <z3++.h>
 #include <unordered_map>
 
@@ -28,88 +29,6 @@ using namespace llvm;
 using namespace WpExpr;
 
 namespace {
-    //copied from higher version llvm
-    StringRef getPredicateName(CmpInst::Predicate Pred) {
-        switch (Pred) {
-            default:                   return "unknown";
-            case FCmpInst::FCMP_FALSE: return "false";
-            case FCmpInst::FCMP_OEQ:   return "oeq";
-            case FCmpInst::FCMP_OGT:   return "ogt";
-            case FCmpInst::FCMP_OGE:   return "oge";
-            case FCmpInst::FCMP_OLT:   return "olt";
-            case FCmpInst::FCMP_OLE:   return "ole";
-            case FCmpInst::FCMP_ONE:   return "one";
-            case FCmpInst::FCMP_ORD:   return "ord";
-            case FCmpInst::FCMP_UNO:   return "uno";
-            case FCmpInst::FCMP_UEQ:   return "ueq";
-            case FCmpInst::FCMP_UGT:   return "ugt";
-            case FCmpInst::FCMP_UGE:   return "uge";
-            case FCmpInst::FCMP_ULT:   return "ult";
-            case FCmpInst::FCMP_ULE:   return "ule";
-            case FCmpInst::FCMP_UNE:   return "une";
-            case FCmpInst::FCMP_TRUE:  return "true";
-            case ICmpInst::ICMP_EQ:    return "=";
-            case ICmpInst::ICMP_NE:    return "ne";
-            case ICmpInst::ICMP_SGT:   return "sgt";
-            case ICmpInst::ICMP_SGE:   return "sge";
-            case ICmpInst::ICMP_SLT:   return "slt";
-            case ICmpInst::ICMP_SLE:   return "sle";
-            case ICmpInst::ICMP_UGT:   return "ugt";
-            case ICmpInst::ICMP_UGE:   return "uge";
-            case ICmpInst::ICMP_ULT:   return "ult";
-            case ICmpInst::ICMP_ULE:   return "ule";
-        }
-    }
-
-    const char * opcode2Name(unsigned opcode){
-        switch (opcode)
-        {
-            case Instruction::Sub:
-                return "-";
-            case Instruction::Mul:
-                return "*";
-            case Instruction::UDiv:
-                return "/";
-            case Instruction::SDiv:
-                return "/";
-            case Instruction::URem:
-                return "mod";
-            case Instruction::SRem:
-                return "mod";
-            case Instruction::Add:
-                return "+";
-            default:
-                return Instruction::getOpcodeName(opcode);
-        }
-    }
-
-    //std::unordered_map<CmpInst::Predicate, const char *> predicate2name;
-    /* =
-            {
-                    {ICmpInst::ICMP_EQ,"ICMP_EQ"},
-                    {ICmpInst::ICMP_NE,"ICMP_NE"},
-                    {ICmpInst::ICMP_UGT,"ICMP_UGT"},
-                    {ICmpInst::ICMP_UGE,"ICMP_UGE"},
-                    {ICmpInst::ICMP_ULT,"ICMP_ULT"},
-                    {ICmpInst::ICMP_ULE,"ICMP_ULE"},
-                    {ICmpInst::ICMP_SGT,"ICMP_SGT"},
-                    {ICmpInst::ICMP_SGE,"ICMP_SGE"},
-                    {ICmpInst::ICMP_SLT,"ICMP_SLT"},
-                    {ICmpInst::ICMP_SLE,"ICMP_SLE"}
-            };*/
-    /*static const std::unordered_map<int, const char *> predicate2name =
-            {
-                    {1,"ICMP_EQ"},
-                    {2,"ICMP_NE"},
-                    {3,"ICMP_UGT"},
-                    {4,"ICMP_UGE"},
-                    {5,"ICMP_ULT"},
-                    {6,"ICMP_ULE"},
-                    {7,"ICMP_SGT"},
-                    {8,"ICMP_SGE"},
-                    {9,"ICMP_SLT"},
-                    {0,"ICMP_SLE"}
-            };*/
 
     //ModulePass for interprocedural analysis
     struct MainPass : public ModulePass {
@@ -261,7 +180,7 @@ namespace {
                                     //TODO: add more notations for the address
                                     break;
                                 }
-                                case Instruction::Ret: {
+                                case Instruction::Ret: {//TODO: handle same varibale names in different scopes
                                     tmp_expr = Node::CreateVar("_ret_");
                                     auto retins = cast<ReturnInst>(&instruction);
                                     if (retins->getReturnValue())
@@ -273,9 +192,28 @@ namespace {
                                     }
                                     break;
                                 }
-                                case Instruction::Br:
+                                case Instruction::Br: {
+                                    auto brins = cast<BranchInst>(&instruction);
+                                    outs()<<"Number of ops: "<<brins->getNumOperands()<<"\n";
+                                    outs()<<"Number of succs: "<<brins->getNumSuccessors()<<"\n";
+                                    auto cnt = brins->getNumSuccessors();
+                                    if (cnt>1)//conditional
+                                    {
+                                        auto cond = brins->getOperand(0)->getName();
+                                        auto br1 = brins->getSuccessor(0)->getName();
+                                        auto br2 = brins->getSuccessor(1)->getName();
+                                        Node::substitute(this->WP, br1, Node::CreateVar(cond));
+                                        Node::substitute(this->WP, br2, Node::CreateUniOp(Node::CreateVar(cond), "NOT"));
+                                    }else { //unconditional. TODO: replace dest name with basic block's name
+
+                                    }
+
+
+
+                                }
                                     break;
                                 case Instruction::Call: {//TODO: handle variable length args and lazy args
+                                    //TODO: handle same variable names in different scopes
                                     auto callins = cast<CallInst>(&instruction);
                                     auto lhs = callins->getName();
                                     outs()<<"call site values: ";
@@ -363,8 +301,39 @@ namespace {
                                     break;
                                 }
 
-                                case Instruction::PHI:
-                                    break;
+                                case Instruction::PHI: {
+                                    this->printOperandNames(instruction);
+                                    auto phiins = cast<PHINode>(&instruction);
+                                    auto lhs = phiins->getName();
+                                    auto cnt = phiins->getNumIncomingValues();
+                                    if (cnt == 1){
+                                        outs() << "This is not supposed to happen.\n";//TODO
+                                    }else{
+                                        //first handling the first two incoming values
+                                        auto cond1 = phiins->getIncomingBlock(0)->getName();
+                                        auto aug1 = this->HandleConstOrVar(phiins->getOperand(0));
+                                        auto new_wp = std::make_shared<Node>(*this->WP);
+                                        Node::NodePtr new_wp_right = std::make_shared<Node>();
+                                        Node::substitute(new_wp, lhs, aug1);// WP-> WP[aug1/lhs]
+                                        new_wp = Node::CreateBinOp(Node::CreateVar(cond1),
+                                                                        std::move(new_wp),
+                                                                        std::string("AND"));
+                                        for (unsigned i = 1;i<cnt;++i){//TODO: design cases to cover
+                                            auto cond = phiins->getIncomingBlock(i)->getName();
+                                            auto aug = this->HandleConstOrVar(phiins->getOperand(1));
+                                            new_wp_right = std::make_shared<Node>(*this->WP);
+                                            Node::substitute(new_wp_right, lhs, aug);
+                                            new_wp_right = Node::CreateBinOp(Node::CreateVar(cond),
+                                                                             std::move(new_wp_right),
+                                                                             std::string("AND"));
+                                            new_wp = Node::CreateBinOp(std::move(new_wp),
+                                                                       std::move(new_wp_right),
+                                                                       std::string("OR"));
+                                        }
+                                        this->WP = std::move(new_wp);
+                                    }
+                                }
+                                break;
                                 default:
                                     break;
                             }
