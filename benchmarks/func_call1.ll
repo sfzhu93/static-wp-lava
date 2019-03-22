@@ -1,4 +1,4 @@
-; ModuleID = 'benchmarks/branch.bc'
+; ModuleID = 'benchmarks/func_call1.bc'
 target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
@@ -20,39 +20,44 @@ entry:
 }
 
 ; Function Attrs: nounwind readnone uwtable
-define i32 @f(i32 %a) #1 {
+define i32 @max2(i32 %a, i32 %b) #1 {
 entry:
-  %add = add nsw i32 %a, 1
-  ret i32 %add
+  %cmp = icmp sgt i32 %a, %b
+  %a.b = select i1 %cmp, i32 %a, i32 %b
+  ret i32 %a.b
+}
+
+; Function Attrs: nounwind readnone uwtable
+define i32 @max(i32 %a, i32 %b, i32 %c) #1 {
+entry:
+  %call = tail call i32 @max2(i32 %a, i32 %b)
+  %call1 = tail call i32 @max2(i32 %call, i32 %c)
+  ret i32 %call1
 }
 
 ; Function Attrs: nounwind uwtable
-define i32 @hello(i32 %a, i32 %b, i32 %c) #2 {
+define i32 @hello(i32 %a, i32 %b, i32 %c, i32 %d) #2 {
 entry:
   tail call void @_wp_begin()
-  %add = add nsw i32 %c, %b
-  %cmp = icmp sgt i32 %add, 2
+  %cmp = icmp sgt i32 %a, 0
   br i1 %cmp, label %if.then, label %if.else
 
 if.then:                                          ; preds = %entry
-  %sub = add nsw i32 %add, -1
-  %sub1 = add nsw i32 %b, -1
-  %sub2 = add nsw i32 %c, -1
-  %mul = mul i32 %sub2, %sub1
-  %mul3 = mul i32 %mul, %sub
+  %call = tail call i32 @max(i32 %a, i32 %b, i32 %c)
   br label %if.end
 
 if.else:                                          ; preds = %entry
-  %call = tail call i32 @f(i32 %add)
-  %mul4 = mul nsw i32 %call, %b
+  %sub = sub nsw i32 0, %a
+  %sub1 = sub nsw i32 0, %b
+  %sub2 = sub nsw i32 0, %c
+  %call3 = tail call i32 @max(i32 %sub, i32 %sub1, i32 %sub2)
+  %sub4 = sub nsw i32 0, %call3
   br label %if.end
 
 if.end:                                           ; preds = %if.else, %if.then
-  %b.addr.0 = phi i32 [ %mul3, %if.then ], [ %mul4, %if.else ]
-  %mul5 = mul i32 %add, %c
-  %mul6 = mul i32 %mul5, %b.addr.0
-  %call7 = tail call i8* @_wp_end(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.1, i64 0, i64 0))
-  ret i32 %mul6
+  %ret.0 = phi i32 [ %call, %if.then ], [ %sub4, %if.else ]
+  %call5 = tail call i8* @_wp_end(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.1, i64 0, i64 0))
+  ret i32 %ret.0
 }
 
 ; Function Attrs: nounwind
