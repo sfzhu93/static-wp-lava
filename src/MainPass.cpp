@@ -138,11 +138,7 @@ namespace {
                             auto func = callInst->getCalledFunction();
                             auto funcName = func->getName();
                             outs() << funcName << "\n";
-                            if (funcName == "_wp_begin") {
-                                outs() << "_wp_begin\n";
-                                this->InWP = false;
-                                //TODO: solve the WP with z3
-                            } else if (funcName == "_wp_end") {
+                            if (funcName == "_wp_end") {
                                 this->InWP = true;
                                 this->WP = Node::CreateBinOp(Node::CreateVar(std::string(wp_init_var)),
                                                              Node::CreateConst(std::string("1234567")),
@@ -220,7 +216,13 @@ namespace {
                                     this->printOperandNames(*callins);
                                     outs()<<lhs<<"\n";
                                     auto func = callins->getCalledFunction();
-                                    outs()<<"#arg: "<<func->arg_size()<<"\n";
+                                    if (func->getName() == "_wp_begin") {
+                                        outs() << "_wp_begin\n";
+                                        this->InWP = false;
+                                        continue;
+                                        //TODO: solve the WP with z3
+                                    }
+                                        outs()<<"#arg: "<<func->arg_size()<<"\n";
                                     outs()<<"call site args: ";
                                     for (Argument &i :func->args())
                                     {
