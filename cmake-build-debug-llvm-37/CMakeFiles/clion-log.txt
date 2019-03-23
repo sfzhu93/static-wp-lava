@@ -1,4 +1,0 @@
-/home/zsf/clion-2018.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/usr/bin/clang-3.7 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-3.7 -G "CodeBlocks - Unix Makefiles" /home/zsf/wp-study/static-wp-lava
--- Configuring done
--- Generating done
--- Build files have been written to: /home/zsf/wp-study/static-wp-lava/cmake-build-debug-llvm-37
