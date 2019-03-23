@@ -22,6 +22,8 @@
 
 #include "WpExpr.h"
 #include "Miscs.h"
+#include "InsHandler.h"
+
 //#include <z3++.h>
 #include <unordered_map>
 
@@ -71,45 +73,12 @@ namespace {
             return std::string("_lava_") + std::to_string(bug_no);
         }
 
-
-        Node::NodePtr HandleConstOrVar(Value *value)
-        {
-            Node::NodePtr ret;
-            if(auto c = dyn_cast<Constant>(value))
-            {
-                if (c->getType()->isIntegerTy()) {
-                    ret = Node::CreateConst(
-                            std::to_string(c->getUniqueInteger().getSExtValue()));//TODO: may change to ZExt
-                }
-                else
-                {
-                    ret = std::make_shared<Node>();//TODO: not implemented!
-                }
-            }else
-            {
-                ret = Node::CreateVar(value->getName());//TODO: would move fuck up here?
-            }
-            return ret;
-        }
-
         Node::NodePtr handleGEP(GetElementPtrInst &GEPIns)
         {
             //TODO: add SVF support
             outs()<<"in handelGEP:\n";
             this->printOperandNames(GEPIns);
-            auto a = GEPIns.getOperand(0);
-            if (isa<GlobalVariable>(a) && a->getName()=="lava_val") {
-                return Node::CreateBinOp(
-                        Node::CreateVar(std::string("lava_val")),
-                        Node::CreateVar(GEPIns.getOperand(2)->getName()),
-                        "[]"
-                        );
-            }
-            /*for (auto i = GEPIns.op_begin();i!=GEPIns.op_end();++i)
-            {
-                if (auto )
-            }*/
-            return Node::CreateVar("_");
+
         }
 
         Node::NodePtr handleFunctionCall(Function& function){
@@ -164,48 +133,27 @@ namespace {
                             switch (opcode) {
                                 case Instruction::GetElementPtr: {
                                     auto gepins = cast<GetElementPtrInst>(&instruction);
-                                    auto gep_expr = this->handleGEP(*gepins);
-                                    Node::substitute(this->WP, gepins->getName(), gep_expr);
+                                    handleGetElementPtr(*gepins, this->WP);
                                     break;
                                 }
                                 case Instruction::Load: {
                                     auto loadins = cast<LoadInst>(&instruction);
                                     outs()<<"In loadIns: \n";
                                     this->printOperandNames(instruction);
-                                    Node::substitute(this->WP, loadins->getName(), Node::CreateVar(loadins->getOperand(0)->getName()));
-                                    //TODO: add more notations for the address
+                                    handleLoad(*loadins, this->WP);
                                     break;
                                 }
                                 case Instruction::Ret: {//TODO: handle same varibale names in different scopes
                                     tmp_expr = Node::CreateVar("_ret_");
                                     auto retins = cast<ReturnInst>(&instruction);
-                                    if (retins->getReturnValue())
-                                    {
-                                        Node::substitute(this->WP,
-                                                std::string("call"),//TODO: replace __ret_val__
-                                                Node::CreateVar(retins->getReturnValue()->getName()));
-
-                                    }
+                                    handleRet(*retins, this->WP);
                                     break;
                                 }
                                 case Instruction::Br: {
                                     auto brins = cast<BranchInst>(&instruction);
                                     outs()<<"Number of ops: "<<brins->getNumOperands()<<"\n";
                                     outs()<<"Number of succs: "<<brins->getNumSuccessors()<<"\n";
-                                    auto cnt = brins->getNumSuccessors();
-                                    if (cnt>1)//conditional
-                                    {
-                                        auto cond = brins->getOperand(0)->getName();
-                                        auto br1 = brins->getSuccessor(0)->getName();
-                                        auto br2 = brins->getSuccessor(1)->getName();
-                                        Node::substitute(this->WP, br1, Node::CreateVar(cond));
-                                        Node::substitute(this->WP, br2, Node::CreateUniOp(Node::CreateVar(cond), "NOT"));
-                                    }else { //unconditional. TODO: replace dest name with basic block's name
-
-                                    }
-
-
-
+                                    handleBranch(*brins, this->WP);
                                 }
                                     break;
                                 case Instruction::Call: {//TODO: handle variable length args and lazy args
@@ -234,7 +182,7 @@ namespace {
                                     auto q = callins->op_begin();
                                     for (;p!=func->arg_end() && q!= callins->op_end(); p++, q++)
                                     {
-                                        auto expr = this->HandleConstOrVar(*q);
+                                        auto expr = HandleConstOrVar(*q);
                                         outs() <<"substitute call sites: " << p->getName()<< " " << expr->ToString()<<"\n";
                                         Node::substitute(this->WP, p->getName(), expr);
                                     }
@@ -243,26 +191,7 @@ namespace {
                                 }
                                 case Instruction::Select: {//from WP to (cond and WP[aug1/lhs] or not cond and WP[aug2/lhs])
                                     auto selectins = cast<SelectInst>(&instruction);
-                                    auto cond = selectins->getOperand(0)->getName();
-                                    auto aug1 = this->HandleConstOrVar(selectins->getOperand(1));
-                                    auto aug2 = this->HandleConstOrVar(selectins->getOperand(2));
-
-                                    auto new_wp_left = std::make_shared<Node>(*this->WP);
-                                    auto new_wp_right = std::make_shared<Node>(*this->WP);
-                                    Node::substitute(new_wp_left, lhs, aug1);// WP-> WP[aug1/lhs]
-                                    Node::substitute(new_wp_right, lhs, aug2);//WP -> WP[aug2/lhs]
-                                    new_wp_left = Node::CreateBinOp(Node::CreateVar(cond),
-                                                                    std::move(new_wp_left),
-                                                                    std::string("AND"));
-                                    new_wp_right = Node::CreateBinOp(Node::CreateUniOp(
-                                            Node::CreateVar(cond),
-                                            std::string("NOT")),
-                                                                     std::move(new_wp_right),
-                                                                     std::string("AND"));
-                                    auto new_wp = Node::CreateBinOp(std::move(new_wp_left),
-                                                                    std::move(new_wp_right),
-                                                                    std::string("OR"));
-                                    this->WP = std::move(new_wp);
+                                    handleSelect(*selectins, this->WP);
                                     break;
                                 }
                                 case Instruction::ZExt:
@@ -279,12 +208,8 @@ namespace {
                                 case Instruction::SRem:
                                 case Instruction::Add: {
                                     auto binins = cast<BinaryOperator>(&instruction);
-                                    auto aug0 = this->HandleConstOrVar(binins->getOperand(0));
-                                    auto aug1 = this->HandleConstOrVar(binins->getOperand(1));
-                                    auto op = std::string(opcode2Name(binins->getOpcode()));
-                                    Node::substitute(this->WP, lhs,
-                                                     Node::CreateBinOp(std::move(aug0), std::move(aug1),
-                                                                       std::move(op)));
+                                    handleBinaryOperator(*binins, this->WP);
+
                                     //outs()<<"Op0 Name: "<<instruction.getOperand(0)->getName()<<"\n";
                                     break;
                                 }
@@ -294,48 +219,16 @@ namespace {
                                 case Instruction::ICmp: //WP[(aug0 predicate aug1)/lhs]
                                 {
                                     auto cmpins = cast<ICmpInst>(&instruction);
-                                    auto aug0 = HandleConstOrVar(cmpins->getOperand(0));
-                                    auto aug1 = HandleConstOrVar(cmpins->getOperand(1));
-                                    auto predicate = getPredicateName(cmpins->getUnsignedPredicate());
-                                    auto cond = Node::CreateBinOp(std::move(aug0), std::move(aug1),
-                                                                  std::string(predicate));
-                                    Node::substitute(this->WP, lhs, cond);
+                                    handleICmp(*cmpins, this->WP);
                                     break;
                                 }
 
                                 case Instruction::PHI: {
                                     this->printOperandNames(instruction);
                                     auto phiins = cast<PHINode>(&instruction);
-                                    auto lhs = phiins->getName();
-                                    auto cnt = phiins->getNumIncomingValues();
-                                    if (cnt == 1){
-                                        outs() << "This is not supposed to happen.\n";//TODO
-                                    }else{
-                                        //first handling the first two incoming values
-                                        auto cond1 = phiins->getIncomingBlock(0)->getName();
-                                        auto aug1 = this->HandleConstOrVar(phiins->getOperand(0));
-                                        auto new_wp = std::make_shared<Node>(*this->WP);
-                                        Node::NodePtr new_wp_right = std::make_shared<Node>();
-                                        Node::substitute(new_wp, lhs, aug1);// WP-> WP[aug1/lhs]
-                                        new_wp = Node::CreateBinOp(Node::CreateVar(cond1),
-                                                                        std::move(new_wp),
-                                                                        std::string("AND"));
-                                        for (unsigned i = 1;i<cnt;++i){//TODO: design cases to cover
-                                            auto cond = phiins->getIncomingBlock(i)->getName();
-                                            auto aug = this->HandleConstOrVar(phiins->getOperand(1));
-                                            new_wp_right = std::make_shared<Node>(*this->WP);
-                                            Node::substitute(new_wp_right, lhs, aug);
-                                            new_wp_right = Node::CreateBinOp(Node::CreateVar(cond),
-                                                                             std::move(new_wp_right),
-                                                                             std::string("AND"));
-                                            new_wp = Node::CreateBinOp(std::move(new_wp),
-                                                                       std::move(new_wp_right),
-                                                                       std::string("OR"));
-                                        }
-                                        this->WP = std::move(new_wp);
+                                    handlePHI(*phiins, this->WP);
                                     }
-                                }
-                                break;
+                                    break;
                                 default:
                                     break;
                             }
