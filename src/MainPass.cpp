@@ -211,6 +211,11 @@ namespace {
                                     break;
                                 }
 
+                                case Instruction::Switch:{//O1 won't generate switch
+
+                                    break;
+                                }
+
                                 case Instruction::PHI: {
                                     this->printOperandNames(instruction);
                                     auto phiins = cast<PHINode>(&instruction);

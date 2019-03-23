@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #SAMPLE=lava1
-SAMPLE=sort3
+#SAMPLE=switch_tax_calc
+SAMPLE=branch_reachability
 #LLVM_VERSION_ATTR=-3.7
 LLVM_VERSION_ATTR=""
 #BUILD_DIR=cmake-build-debug-llvm-37
