@@ -114,20 +114,7 @@ namespace {
                                                              std::string("<"));
                                 //_init_var < magic number
 
-                            } /*else if (funcName == "lava_get") {
-                                    auto lhs_name = callInst->getName();
-                                    auto aug = dyn_cast<Constant>(callInst->getArgOperand(0));
-                                    auto num = aug->getUniqueInteger().getSExtValue();//TODO: may change to ZExt
-                                    Node::substitute(this->WP,
-                                                     lhs_name,
-                                                     Node::CreateVar(buildLavaVarName(num)));
-                                } else if (funcName == "lava_set") {
-                                    auto num = dyn_cast<Constant>(
-                                            callInst->getArgOperand(0))->getUniqueInteger().getSExtValue();
-                                    auto aug1 = callInst->getArgOperand(1);
-                                    auto lava_val_node = this->HandleConstOrVar(aug1);
-                                    Node::substitute(this->WP, buildLavaVarName(num), lava_val_node);
-                                }*/
+                            }
                         }else if (this->InWP) {
                             outs() << "InWP: ";
                             switch (opcode) {
@@ -167,6 +154,7 @@ namespace {
                                     if (func->getName() == "_wp_begin") {
                                         outs() << "_wp_begin\n";
                                         this->InWP = false;
+                                        outs()<<this->WP->ToSMTLanguage()<<"\n";
                                         continue;
                                         //TODO: solve the WP with z3
                                     }

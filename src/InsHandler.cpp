@@ -8,6 +8,10 @@
 using namespace llvm;
 using namespace WpExpr;
 
+static const char * strAnd = "and";
+static const char * strOr = "or";
+static const char * strNot = "not";
+
 
 /**
  *
@@ -106,15 +110,15 @@ void handleSelect(SelectInst &inst, Node::NodePtr &expr) {
     Node::substitute(new_wp_right, lhs, aug2);//WP -> WP[aug2/lhs]
     new_wp_left = Node::CreateBinOp(Node::CreateVar(cond),
                                     std::move(new_wp_left),
-                                    std::string("AND"));
+                                    std::string(strAnd));
     new_wp_right = Node::CreateBinOp(Node::CreateUniOp(
             Node::CreateVar(cond),
-            std::string("NOT")),
+            std::string(strNot)),
                                      std::move(new_wp_right),
-                                     std::string("AND"));
+                                     std::string(strAnd));
     auto new_wp = Node::CreateBinOp(std::move(new_wp_left),
                                     std::move(new_wp_right),
-                                    std::string("OR"));
+                                    std::string(strOr));
     expr = std::move(new_wp);
 }
 
@@ -154,7 +158,7 @@ void handlePHI(PHINode &inst, Node::NodePtr &expr) {
         Node::substitute(new_wp, lhs, aug1);// WP-> WP[aug1/lhs]
         new_wp = Node::CreateBinOp(Node::CreateVar(cond1),
                                    std::move(new_wp),
-                                   std::string("AND"));
+                                   std::string(strAnd));
         for (unsigned i = 1; i < cnt; ++i) {//TODO: design cases to cover different cnt
             auto cond = inst.getIncomingBlock(i)->getName();
             auto aug = HandleConstOrVar(inst.getOperand(1));
@@ -162,10 +166,10 @@ void handlePHI(PHINode &inst, Node::NodePtr &expr) {
             Node::substitute(new_wp_right, lhs, aug);
             new_wp_right = Node::CreateBinOp(Node::CreateVar(cond),
                                              std::move(new_wp_right),
-                                             std::string("AND"));
+                                             std::string(strAnd));
             new_wp = Node::CreateBinOp(std::move(new_wp),
                                        std::move(new_wp_right),
-                                       std::string("OR"));
+                                       std::string(strOr));
         }
         expr = std::move(new_wp);
     }

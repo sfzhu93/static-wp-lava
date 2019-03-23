@@ -65,6 +65,23 @@ namespace WpExpr{
             return ret;
         }
 
+        std::string ToSMTLanguage(){
+            std::string ret;
+            switch(this->type)
+            {
+                case UNIOP:
+                    ret = "(" + this->value + " " + this->left->ToSMTLanguage() + ")";
+                    break;
+                case BINOP:
+                    ret = "( " + this->value + " " + this->left->ToSMTLanguage() + " " + this->right->ToSMTLanguage() + ")";
+                    break;
+                case CONST:
+                case VAR:
+                    return this->value;
+            }
+            return ret;
+        }
+
         static NodePtr CreateBinOp(NodePtr&& left, NodePtr&& right, std::string&& value)
         {
             auto ret = std::make_shared<Node>(BINOP, std::move(left), std::move(right), std::move(value));
