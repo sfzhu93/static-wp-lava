@@ -5,8 +5,13 @@
 #ifndef STATIC_WP_LAVA_INSHANDLER_H
 #define STATIC_WP_LAVA_INSHANDLER_H
 
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/CFG.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/InstrTypes.h"
 #include "WpExpr.h"
 
 using namespace llvm;

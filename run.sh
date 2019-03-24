@@ -9,4 +9,5 @@ BUILD_DIR=cmake-build-debug
 clang${LLVM_VERSION_ATTR} -c -O1 -emit-llvm  benchmarks/${SAMPLE}.c -o benchmarks/${SAMPLE}.bc
 llvm-dis${LLVM_VERSION_ATTR} benchmarks/${SAMPLE}.bc
 #instnamer names each variable
-opt${LLVM_VERSION_ATTR} -instnamer -load ${BUILD_DIR}/libstatic_wp_lava.so -wpgen benchmarks/${SAMPLE}.bc -o /dev/null
+opt${LLVM_VERSION_ATTR} -dot-cfg -instnamer -load ${BUILD_DIR}/libstatic_wp_lava.so -wpgen benchmarks/${SAMPLE}.bc -o /dev/null
+dot -Tpng cfg.hello.dot -o hello.png
