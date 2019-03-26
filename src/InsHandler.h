@@ -27,5 +27,6 @@ void handleSelect(SelectInst &inst, Node::NodePtr &expr);
 void handleBinaryOperator(BinaryOperator &inst, Node::NodePtr &expr);
 void handlePHI(PHINode &inst, Node::NodePtr &expr);
 void handleICmp(ICmpInst &inst, Node::NodePtr &expr);
+void handleCast(CastInst &inst, Node::NodePtr &expr);
 
 #endif //STATIC_WP_LAVA_INSHANDLER_H

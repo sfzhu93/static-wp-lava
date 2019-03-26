@@ -36,7 +36,28 @@ int hello2(int a, int b, int c){
     {
         if (b*c>10)
             return 0;
+        a+=10;
     }
+
+    x = a+b+c;
+    _wp_end("");
+    return x;
+}
+
+int hello3(int a, int b, int c){
+    int x;
+    _wp_begin();
+    if (a<0)
+        return 0;
+    if (a+b>0)
+        return -1;
+    if (c<100)
+    {
+        if (b*c>10)
+            b = 1;
+        a += 10;
+    }
+
     x = a+b+c;
     _wp_end("");
     return x;

@@ -4,6 +4,8 @@
 
 #include "InsHandler.h"
 #include "Miscs.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Constants.h"
 
 using namespace llvm;
 using namespace WpExpr;
@@ -24,9 +26,27 @@ Node::NodePtr HandleConstOrVar(Value *value) {
     Node::NodePtr ret;
     if(auto c = dyn_cast<Constant>(value))
     {
+        auto type = c->getType()->getTypeID();
+        switch (type) {
+            case Type::IntegerTyID:
+                ret = Node::CreateConst(
+                        std::to_string(c->getUniqueInteger().getSExtValue()));//TODO: may change to ZExt
+                break;
+            case Type::HalfTyID:
+            case Type::FloatTyID:
+            case Type::DoubleTyID:
+            case Type::X86_FP80TyID:
+            case Type::FP128TyID:
+            case Type::PPC_FP128TyID: {
+                auto value = dyn_cast<ConstantFP>(c);
+
+                ret = Node::CreateConst(std::to_string(value->getValueAPF().convertToDouble()));
+                break;
+            }
+
+        }
         if (c->getType()->isIntegerTy()) {//it is an integer
-            ret = Node::CreateConst(
-                    std::to_string(c->getUniqueInteger().getSExtValue()));//TODO: may change to ZExt
+
         }
         else
         {
@@ -175,3 +195,28 @@ void handlePHI(PHINode &inst, Node::NodePtr &expr) {
     }
 }
 
+
+void handleCast(CastInst &inst, Node::NodePtr &expr) {
+    auto lhs = inst.getName();
+    switch (inst.getOpcode()){
+        case Instruction::FPToUI:
+        case Instruction::FPToSI:{
+            auto aug = HandleConstOrVar(inst.getOperand(0));
+            auto op = std::string("to_int");
+            Node::substitute(expr, lhs,
+                             Node::CreateUniOp(std::move(aug),
+                                               std::move(op)));
+            break;
+        }
+        case Instruction::UIToFP:
+        case Instruction::SIToFP: {
+            auto aug = HandleConstOrVar(inst.getOperand(0));
+            auto op = std::string("to_real");
+            Node::substitute(expr, lhs,
+                             Node::CreateUniOp(std::move(aug),
+                                               std::move(op)));
+            break;
+        }
+
+    }
+}

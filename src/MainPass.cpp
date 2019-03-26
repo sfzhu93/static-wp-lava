@@ -118,6 +118,74 @@ namespace {
                         }else if (this->InWP) {
                             outs() << "InWP: ";
                             switch (opcode) {
+                                // Terminator instructions
+                                case Instruction::Ret: {//TODO: handle same varibale names in different scopes
+                                    tmp_expr = Node::CreateVar("_ret_");
+                                    auto retins = cast<ReturnInst>(&instruction);
+                                    handleRet(*retins, this->WP);
+                                    break;
+                                }
+
+                                case Instruction::Br: {
+                                    auto brins = cast<BranchInst>(&instruction);
+                                    outs()<<"Number of ops: "<<brins->getNumOperands()<<"\n";
+                                    outs()<<"Number of succs: "<<brins->getNumSuccessors()<<"\n";
+                                    handleBranch(*brins, this->WP);
+                                }
+                                    break;
+
+                                case Instruction::Switch:{//O1 won't generate switch
+                                    outs()<<"unimplemented instr\n";
+                                    break;
+                                }
+
+                                case Instruction::IndirectBr:
+                                {
+                                    outs()<<"unimplemented instr\n";
+                                    break;
+                                }
+
+                                case Instruction::Invoke:
+                                {
+                                    outs()<<"unimplemented instr\n";
+                                    break;
+                                }
+
+                                case Instruction::Resume:
+                                {
+                                    outs()<<"unimplemented instr\n";
+                                    break;
+                                }
+                                // Unary Operations
+
+                                // Binary Operations
+                                case Instruction::Add:
+                                case Instruction::FAdd:
+                                case Instruction::Sub:
+                                case Instruction::FSub:
+                                case Instruction::Mul:
+                                case Instruction::FMul:
+                                case Instruction::UDiv:
+                                case Instruction::SDiv:
+                                case Instruction::FDiv:
+                                case Instruction::URem:
+                                case Instruction::SRem:
+                                case Instruction::FRem:
+                                {
+                                    auto binins = cast<BinaryOperator>(&instruction);
+                                    handleBinaryOperator(*binins, this->WP);
+
+                                    //outs()<<"Op0 Name: "<<instruction.getOperand(0)->getName()<<"\n";
+                                    break;
+                                }
+//todo: bitwise operations
+//TODO: vectors?
+
+                                // Memory
+                                case Instruction::Alloca: {
+                                    outs()<<"unimplemented instr\n";
+                                    break;
+                                }
                                 case Instruction::GetElementPtr: {
                                     auto gepins = cast<GetElementPtrInst>(&instruction);
                                     handleGetElementPtr(*gepins, this->WP);
@@ -130,19 +198,44 @@ namespace {
                                     handleLoad(*loadins, this->WP);
                                     break;
                                 }
-                                case Instruction::Ret: {//TODO: handle same varibale names in different scopes
-                                    tmp_expr = Node::CreateVar("_ret_");
-                                    auto retins = cast<ReturnInst>(&instruction);
-                                    handleRet(*retins, this->WP);
+
+                                case Instruction::Store: {
+                                    outs()<<"unimplemented instr\n";
                                     break;
                                 }
-                                case Instruction::Br: {
-                                    auto brins = cast<BranchInst>(&instruction);
-                                    outs()<<"Number of ops: "<<brins->getNumOperands()<<"\n";
-                                    outs()<<"Number of succs: "<<brins->getNumSuccessors()<<"\n";
-                                    handleBranch(*brins, this->WP);
-                                }
+                                case Instruction::Fence: {
+                                    outs()<<"unimplemented instr\n";
                                     break;
+                                }
+
+                                //conversion
+                                case Instruction::ZExt:
+                                case Instruction::SExt: {
+                                    Node::substitute(this->WP, instruction.getName(),
+                                                     Node::CreateVar(instruction.getOperand(0)->getName()));
+                                    break;
+                                }
+
+                                case Instruction::UIToFP:
+                                case Instruction::SIToFP:
+                                case Instruction::FPToUI:
+                                case Instruction::FPToSI:
+                                {
+                                    auto castinst = cast<CastInst>(&instruction);
+                                    handleCast(*castinst, this->WP);
+                                    //TODO: generate to_real and to_int
+                                    break;
+                                }
+                                case Instruction::Trunc: case Instruction::FPTrunc:
+                                case Instruction::FPExt:
+                                case Instruction::PtrToInt:
+                                case Instruction::IntToPtr: case Instruction::BitCast:
+                                case Instruction::AddrSpaceCast: {
+                                    outs()<<"unimplemented instr\n";
+                                    break;
+                                }
+
+                                //Other
                                 case Instruction::Call: {//TODO: handle variable length args and lazy args
                                     //TODO: handle same variable names in different scopes
                                     auto callins = cast<CallInst>(&instruction);
@@ -182,25 +275,8 @@ namespace {
                                     handleSelect(*selectins, this->WP);
                                     break;
                                 }
-                                case Instruction::ZExt:
-                                case Instruction::SExt: {
-                                    Node::substitute(this->WP, instruction.getName(),
-                                            Node::CreateVar(instruction.getOperand(0)->getName()));
-                                    break;
-                                }
-                                case Instruction::Sub:
-                                case Instruction::Mul:
-                                case Instruction::UDiv:
-                                case Instruction::SDiv:
-                                case Instruction::URem:
-                                case Instruction::SRem:
-                                case Instruction::Add: {
-                                    auto binins = cast<BinaryOperator>(&instruction);
-                                    handleBinaryOperator(*binins, this->WP);
 
-                                    //outs()<<"Op0 Name: "<<instruction.getOperand(0)->getName()<<"\n";
-                                    break;
-                                }
+
                                     /*case Instruction::And:
                                     case Instruction::Or:
                                     case Instruction::Xor:*/
@@ -211,10 +287,13 @@ namespace {
                                     break;
                                 }
 
-                                case Instruction::Switch:{//O1 won't generate switch
-
+                                case Instruction::VAArg:
+                                case Instruction::FCmp:
+                                case Instruction::LandingPad: {
+                                    outs()<<"unimplemented instr\n";
                                     break;
                                 }
+
 
                                 case Instruction::PHI: {
                                     this->printOperandNames(instruction);
@@ -223,6 +302,7 @@ namespace {
                                     }
                                     break;
                                 default:
+                                    outs()<<"unknown instr\n";
                                     break;
                             }
                             //instruction.dump();
