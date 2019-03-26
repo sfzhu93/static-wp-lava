@@ -192,6 +192,7 @@ void handlePHI(PHINode &inst, Node::NodePtr &expr) {
                                        std::string(strOr));
         }
         expr = std::move(new_wp);
+        outs() <<"end of handlPHI\n";
     }
 }
 

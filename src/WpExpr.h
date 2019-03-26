@@ -109,7 +109,7 @@ namespace WpExpr{
             switch(src->type)
             {
                 case VAR:
-                    if (src->name == name || src->name == WpExpr::wp_init_var)
+                    if (src->name == name )//|| src->name == WpExpr::wp_init_var
                     {
                         src = expr;
                     }else

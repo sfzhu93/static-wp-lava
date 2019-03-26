@@ -109,7 +109,8 @@ namespace {
                             outs() << funcName << "\n";
                             if (funcName == "_wp_end") {
                                 this->InWP = true;
-                                this->WP = Node::CreateBinOp(Node::CreateVar(std::string(wp_init_var)),
+                                auto prev_var_name = instruction.getPrevNode()->getName();
+                                this->WP = Node::CreateBinOp(Node::CreateVar(std::string(prev_var_name)),
                                                              Node::CreateConst(std::string("1234567")),
                                                              std::string("<"));
                                 //_init_var < magic number
