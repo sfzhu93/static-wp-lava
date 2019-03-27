@@ -81,7 +81,7 @@ namespace {
 
         }
 
-        Node::NodePtr handleFunctionCall(Function& function){
+        Node::NodePtr handleFunctionCall(Function& function) {
             auto nullret = Node::CreateVar(std::string(""));
             outs() << "In Function:" << function.getName() << "()\n";
             if(function.isDeclaration())
@@ -118,6 +118,8 @@ namespace {
                             }
                         }else if (this->InWP) {
                             outs() << "InWP: ";
+                            assert(instruction.getOpcode()==opcode);
+                            //opcode = instruction.getOpcode();
                             switch (opcode) {
                                 // Terminator instructions
                                 case Instruction::Ret: {//TODO: handle same varibale names in different scopes
@@ -180,6 +182,16 @@ namespace {
                                     break;
                                 }
 //todo: bitwise operations
+                                case Instruction::And:case Instruction::Or: {
+                                    auto bitwiseinst = cast<BinaryOperator>(&instruction);
+                                    auto width = bitwiseinst->getType()->getIntegerBitWidth();
+                                    if (width == 1){
+                                        handleLogicOp(*bitwiseinst, this->WP);
+                                    }
+                                    outs()<<"bit width: "<<std::to_string(width)<<"\n";
+                                    break;
+                                }
+
 //TODO: vectors?
 
                                 // Memory
@@ -210,10 +222,13 @@ namespace {
                                 }
 
                                 //conversion
+                                case Instruction::Trunc: case Instruction::FPTrunc:
+                                case Instruction::FPExt:
                                 case Instruction::ZExt:
                                 case Instruction::SExt: {
                                     Node::substitute(this->WP, instruction.getName(),
                                                      Node::CreateVar(instruction.getOperand(0)->getName()));
+                                    //TODO: should we add the semantics of floating point numbers into constraints?
                                     break;
                                 }
 
@@ -227,8 +242,7 @@ namespace {
                                     //TODO: generate to_real and to_int
                                     break;
                                 }
-                                case Instruction::Trunc: case Instruction::FPTrunc:
-                                case Instruction::FPExt:
+
                                 case Instruction::PtrToInt:
                                 case Instruction::IntToPtr: case Instruction::BitCast:
                                 case Instruction::AddrSpaceCast: {
@@ -290,6 +304,10 @@ namespace {
 
                                 case Instruction::VAArg:
                                 case Instruction::FCmp:
+                                {
+                                    auto fcmpinst = cast<FCmpInst>(&instruction);
+                                    handleFCmp(*fcmpinst, this->WP);
+                                }
                                 case Instruction::LandingPad: {
                                     outs()<<"unimplemented instr\n";
                                     break;

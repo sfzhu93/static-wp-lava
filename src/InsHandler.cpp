@@ -43,14 +43,6 @@ Node::NodePtr HandleConstOrVar(Value *value) {
                 ret = Node::CreateConst(std::to_string(value->getValueAPF().convertToDouble()));
                 break;
             }
-
-        }
-        if (c->getType()->isIntegerTy()) {//it is an integer
-
-        }
-        else
-        {
-            ret = std::make_shared<Node>();//TODO: not implemented!
         }
     }else//return the variable name
     {
@@ -220,4 +212,38 @@ void handleCast(CastInst &inst, Node::NodePtr &expr) {
         }
 
     }
+}
+
+
+void handleLogicOp(BinaryOperator &inst, Node::NodePtr &expr) {
+    auto aug0 = HandleConstOrVar(inst.getOperand(0));
+    auto aug1 = HandleConstOrVar(inst.getOperand(1));
+    const char * op;
+    switch (inst.getOpcode())
+    {
+        case Instruction::And:op = "and";
+            break;
+        case Instruction::Or:op = "or";
+            break;
+        case Instruction::Xor:op = "xor";
+            break;
+        default:
+            assert(false);
+    }
+    auto lhs = inst.getName();
+    Node::substitute(expr, lhs,
+                     Node::CreateBinOp(std::move(aug0), std::move(aug1),
+                                       op));
+    //TODO: not implemented
+}
+
+
+void handleFCmp(FCmpInst &inst, Node::NodePtr &expr) {
+    auto aug0 = HandleConstOrVar(inst.getOperand(0));
+    auto aug1 = HandleConstOrVar(inst.getOperand(1));
+    auto predicate = getPredicateName(inst.getPredicate());
+    auto cond = Node::CreateBinOp(std::move(aug0), std::move(aug1),
+                                  std::string(predicate));
+    auto lhs = inst.getName();
+    Node::substitute(expr, lhs, cond);
 }
