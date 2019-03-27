@@ -23,7 +23,8 @@
 #include "WpExpr.h"
 #include "Miscs.h"
 #include "InsHandler.h"
-
+#include "WpPrinter.h"
+#include <iostream>
 //#include <z3++.h>
 #include <unordered_map>
 
@@ -39,6 +40,7 @@ namespace {
         WpExpr::Node::NodePtr WP;
         bool InWP = false;
         std::unordered_map<std::uintptr_t, int> naming_map;
+        WpPrinter wpPrinter;
 
         int naming_index = 0;
 
@@ -325,7 +327,12 @@ namespace {
                                     break;
                             }
                             //instruction.dump();
-                            outs() << "WP: " << this->WP->ToString() << "\n";
+                            auto wpstring = this->WP->ToString();
+                            outs() << "WP: " << wpstring << "\n";
+                            std::string inststr;
+                            llvm::raw_string_ostream rso(inststr);
+                            instruction.print(rso);
+                            this->wpPrinter.emit(inststr, wpstring);
                         }
 
                     }
@@ -335,10 +342,13 @@ namespace {
         }
 
         bool runOnModule(Module &M) override {
+            std::cout<<"init\n";
+            this->wpPrinter.open(std::string(M.getName())+std::string("_wp.md"));
             for (Function &F : M) {
                 this->handleFunctionCall(F);
 
             }
+            this->wpPrinter.close();
             return false;
         }
     };
