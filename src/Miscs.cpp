@@ -59,7 +59,7 @@ StringRef getPredicateName(CmpInst::Predicate Pred) {
         case ICmpInst::ICMP_UGE:
             return "uge";
         case ICmpInst::ICMP_ULT:
-            return "ult";
+            return "<";
         case ICmpInst::ICMP_ULE:
             return "ule";
     }
@@ -68,9 +68,11 @@ StringRef getPredicateName(CmpInst::Predicate Pred) {
 
 const char *opcode2Name(unsigned opcode) {
     switch (opcode) {
+        case Instruction::FAdd:case Instruction::Add:
+            return "+";
         case Instruction::Sub:
             return "-";
-        case Instruction::Mul:
+        case Instruction::FMul:case Instruction::Mul:
             return "*";
         case Instruction::UDiv:
             return "/";
@@ -80,8 +82,6 @@ const char *opcode2Name(unsigned opcode) {
             return "mod";
         case Instruction::SRem:
             return "mod";
-        case Instruction::Add:
-            return "+";
         default:
             return Instruction::getOpcodeName(opcode);
     }

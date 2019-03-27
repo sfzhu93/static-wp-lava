@@ -4,6 +4,8 @@
 
 #include "InsHandler.h"
 #include "Miscs.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Constants.h"
 
 using namespace llvm;
 using namespace WpExpr;
@@ -24,13 +26,23 @@ Node::NodePtr HandleConstOrVar(Value *value) {
     Node::NodePtr ret;
     if(auto c = dyn_cast<Constant>(value))
     {
-        if (c->getType()->isIntegerTy()) {//it is an integer
-            ret = Node::CreateConst(
-                    std::to_string(c->getUniqueInteger().getSExtValue()));//TODO: may change to ZExt
-        }
-        else
-        {
-            ret = std::make_shared<Node>();//TODO: not implemented!
+        auto type = c->getType()->getTypeID();
+        switch (type) {
+            case Type::IntegerTyID:
+                ret = Node::CreateConst(
+                        std::to_string(c->getUniqueInteger().getSExtValue()));//TODO: may change to ZExt
+                break;
+            case Type::HalfTyID:
+            case Type::FloatTyID:
+            case Type::DoubleTyID:
+            case Type::X86_FP80TyID:
+            case Type::FP128TyID:
+            case Type::PPC_FP128TyID: {
+                auto value = dyn_cast<ConstantFP>(c);
+
+                ret = Node::CreateConst(std::to_string(value->getValueAPF().convertToDouble()));
+                break;
+            }
         }
     }else//return the variable name
     {
@@ -172,6 +184,66 @@ void handlePHI(PHINode &inst, Node::NodePtr &expr) {
                                        std::string(strOr));
         }
         expr = std::move(new_wp);
+        outs() <<"end of handlPHI\n";
     }
 }
 
+
+void handleCast(CastInst &inst, Node::NodePtr &expr) {
+    auto lhs = inst.getName();
+    switch (inst.getOpcode()){
+        case Instruction::FPToUI:
+        case Instruction::FPToSI:{
+            auto aug = HandleConstOrVar(inst.getOperand(0));
+            auto op = std::string("to_int");
+            Node::substitute(expr, lhs,
+                             Node::CreateUniOp(std::move(aug),
+                                               std::move(op)));
+            break;
+        }
+        case Instruction::UIToFP:
+        case Instruction::SIToFP: {
+            auto aug = HandleConstOrVar(inst.getOperand(0));
+            auto op = std::string("to_real");
+            Node::substitute(expr, lhs,
+                             Node::CreateUniOp(std::move(aug),
+                                               std::move(op)));
+            break;
+        }
+
+    }
+}
+
+
+void handleLogicOp(BinaryOperator &inst, Node::NodePtr &expr) {
+    auto aug0 = HandleConstOrVar(inst.getOperand(0));
+    auto aug1 = HandleConstOrVar(inst.getOperand(1));
+    const char * op;
+    switch (inst.getOpcode())
+    {
+        case Instruction::And:op = "and";
+            break;
+        case Instruction::Or:op = "or";
+            break;
+        case Instruction::Xor:op = "xor";
+            break;
+        default:
+            assert(false);
+    }
+    auto lhs = inst.getName();
+    Node::substitute(expr, lhs,
+                     Node::CreateBinOp(std::move(aug0), std::move(aug1),
+                                       op));
+    //TODO: not implemented
+}
+
+
+void handleFCmp(FCmpInst &inst, Node::NodePtr &expr) {
+    auto aug0 = HandleConstOrVar(inst.getOperand(0));
+    auto aug1 = HandleConstOrVar(inst.getOperand(1));
+    auto predicate = getPredicateName(inst.getPredicate());
+    auto cond = Node::CreateBinOp(std::move(aug0), std::move(aug1),
+                                  std::string(predicate));
+    auto lhs = inst.getName();
+    Node::substitute(expr, lhs, cond);
+}
