@@ -8,7 +8,13 @@
 #include <memory>
 
 namespace WpExpr{
-    enum NodeType {BINOP, UNIOP, VAR, CONST};
+    enum NodeType {
+        BINOP,        //Binary Operator
+        UNIOP,        //Unary Operator
+        VAR,          //Variable
+        CONST,        //Constant
+        UPRED         //Undetermined predicate of a variable
+    };
     enum Optr {PLUS, MINUS, AND, OR, NOT, MUL, DIV};
 
     static const char *wp_init_var = "__wp_init_var";
@@ -19,39 +25,34 @@ namespace WpExpr{
         typedef std::shared_ptr<Node> NodePtr;
         NodePtr left, right;
         std::string value;
-        std::string& name;
+        std::string &name;
 
-        Node(): name(value) {}
-        Node(Node& node): Node()
-        {
+        Node() : name(value) {}
+
+        Node(Node &node) : Node() {
             this->type = node.type;
-            if (node.left != nullptr)
-            {
+            if (node.left != nullptr) {
                 this->left = std::make_shared<Node>(*node.left);
-            }else{
+            } else {
                 this->left = nullptr;
             }
-            if (node.right != nullptr)
-            {
+            if (node.right != nullptr) {
                 this->right = std::make_shared<Node>(*node.right);
-            }else{
+            } else {
                 this->right = nullptr;
             }
             this->value = node.value;
 
         }
 
-        Node(NodeType type, NodePtr&& left, NodePtr&& right, std::string&& val):
-            type(type), left(std::move(left)), right(std::move(right)), value(std::move(val)), name(value)
-        {
+        Node(NodeType type, NodePtr &&left, NodePtr &&right, std::string &&val) :
+                type(type), left(std::move(left)), right(std::move(right)), value(std::move(val)), name(value) {
 
         }
 
-        std::string ToString()
-        {
+        std::string ToString() {
             std::string ret;
-            switch(this->type)
-            {
+            switch (this->type) {
                 case UNIOP:
                     ret = "(" + this->value + " " + this->left->ToString() + ")";
                     break;
@@ -61,59 +62,93 @@ namespace WpExpr{
                 case CONST:
                 case VAR:
                     return this->value;
+                case UPRED:
+                    std::string leftstr, rightstr;
+                    if (this->left)
+                    {
+                        leftstr = this->left->ToString();
+                    }
+                    if (this->right)
+                    {
+                        rightstr = this->right->ToString();
+                    }
+                    return "UPred("+leftstr+ " " + this->value + " " +rightstr + ")";
             }
             return ret;
         }
 
-        std::string ToSMTLanguage(){
+        std::string ToSMTLanguage() {
             std::string ret;
-            switch(this->type)
-            {
+            switch (this->type) {
                 case UNIOP:
                     ret = "(" + this->value + " " + this->left->ToSMTLanguage() + ")";
                     break;
                 case BINOP:
-                    ret = "( " + this->value + " " + this->left->ToSMTLanguage() + " " + this->right->ToSMTLanguage() + ")";
+                    ret = "( " + this->value + " " + this->left->ToSMTLanguage() + " " + this->right->ToSMTLanguage() +
+                          ")";
                     break;
                 case CONST:
                 case VAR:
                     return this->value;
+                case UPRED:
+                    std::string leftstr, rightstr;
+                    if (this->left)
+                    {
+                        leftstr = this->left->ToString();
+                    }
+                    if (this->right)
+                    {
+                        rightstr = this->right->ToString();
+                    }
+                    return "UPred("+ this->value + leftstr+ " " +rightstr + ")";
             }
             return ret;
         }
 
-        static NodePtr CreateBinOp(NodePtr&& left, NodePtr&& right, std::string&& value)
-        {
+        static NodePtr CreateBinOp(NodePtr &&left, NodePtr &&right, std::string &&value) {
             auto ret = std::make_shared<Node>(BINOP, std::move(left), std::move(right), std::move(value));
             return ret;
         }
 
-        static NodePtr CreateUniOp(NodePtr&& left, std::string&& value)
-        {
-            auto ret = std::make_shared<Node>(UNIOP, std::move(left), std::move(std::make_shared<Node>()), std::move(value));
+        static NodePtr CreateUniOp(NodePtr &&left, std::string &&value) {
+            auto ret = std::make_shared<Node>(UNIOP, std::move(left), NodePtr(),
+                                              std::move(value));
             return ret;
         }
 
-        static NodePtr CreateVar(std::string&& name)
-        {
-            auto ret = std::make_shared<Node>(VAR, std::move(std::make_shared<Node>()), std::move(std::make_shared<Node>()), std::move(name));
+        static NodePtr CreateVar(std::string &&name) {
+            auto ret = std::make_shared<Node>(VAR, NodePtr(),
+                                              NodePtr(), std::move(name));
             return ret;
         }
 
-        static NodePtr CreateConst(std::string value)
-        {
-            return std::make_shared<Node>(CONST, std::move(std::make_shared<Node>()), std::move(std::make_shared<Node>()), std::move(value));
+        static NodePtr CreateConst(std::string value) {
+            return std::make_shared<Node>(CONST, NodePtr(),
+                                          NodePtr(), std::move(value));
         }
 
-        static NodePtr substitute(NodePtr& src, const std::string& name, const NodePtr& expr){
-            switch(src->type)
-            {
+        static NodePtr CreateUndeterminedPredicate(std::string name) {
+            return std::make_shared<Node>(UPRED, NodePtr(),
+                                          NodePtr(), std::move(name));
+
+        }
+
+        static NodePtr substitute(NodePtr &src, const std::string &name, const NodePtr &expr) {
+            switch (src->type) {
                 case VAR:
-                    if (src->name == name )//|| src->name == WpExpr::wp_init_var
+                    if (src->name == name)//|| src->name == WpExpr::wp_init_var
                     {
                         src = expr;
-                    }else
+                    } else {
+                        //TODO: warning nothing substituted
+                    }
+                    break;
+                case UPRED:
+                    if (src->name == name)//|| src->name == WpExpr::wp_init_var
                     {
+                        src = std::make_shared<Node>(*expr);
+                        src->type = UPRED;
+                    } else {
                         //TODO: warning nothing substituted
                     }
                     break;
@@ -134,7 +169,6 @@ namespace WpExpr{
     private:
 
     };
-
 
 }
 

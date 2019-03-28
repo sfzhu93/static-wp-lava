@@ -43,6 +43,8 @@ Node::NodePtr HandleConstOrVar(Value *value) {
                 ret = Node::CreateConst(std::to_string(value->getValueAPF().convertToDouble()));
                 break;
             }
+            default:
+                outs()<<"unresolved constant type!\n";
         }
     }else//return the variable name
     {
@@ -65,12 +67,14 @@ void handleGetElementPtr(GetElementPtrInst &inst, Node::NodePtr &expr) {
                 Node::CreateVar(inst.getOperand(2)->getName()),
                 "[]"
         );
+    }else{
+        value = Node::CreateVar("_");
     }
     /*for (auto i = GEPIns.op_begin();i!=GEPIns.op_end();++i)
     {
         if (auto )
     }*/
-    value = Node::CreateVar("_");
+
     Node::substitute(expr, inst.getName(), value);
 }
 
@@ -89,9 +93,10 @@ void handleLoad(LoadInst &inst, Node::NodePtr &expr){
 void handleRet(ReturnInst &inst, Node::NodePtr &expr) {
     if (inst.getReturnValue())
     {
-        Node::substitute(expr,
+        expr = Node::CreateUndeterminedPredicate(inst.getReturnValue()->getName());
+        /*Node::substitute(expr,
                          std::string("call"),//TODO: replace __ret_val__
-                         Node::CreateVar(inst.getReturnValue()->getName()));
+                         Node::CreateVar(inst.getReturnValue()->getName()));*/
 
     }
 }

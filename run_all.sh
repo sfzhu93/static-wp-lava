@@ -8,8 +8,12 @@ SAMPLE=sort3
 LLVM_VERSION_ATTR=""
 #BUILD_DIR=cmake-build-debug-llvm-37
 BUILD_DIR=cmake-build-debug
-clang${LLVM_VERSION_ATTR} -c -O1 -emit-llvm  benchmarks/${SAMPLE}.c -o benchmarks/${SAMPLE}.bc
-llvm-dis${LLVM_VERSION_ATTR} benchmarks/${SAMPLE}.bc
+cd benchmarks
+for SAMPLE in *.c; do
+name=$(echo "$SAMPLE" | cut -f 1 -d '.')
+echo "working on ${name}"
+clang${LLVM_VERSION_ATTR} -c -O1 -emit-llvm  ${name}.c -o ${name}.bc
+llvm-dis${LLVM_VERSION_ATTR} ${name}.bc
 #instnamer names each variable
-opt${LLVM_VERSION_ATTR} -dot-cfg -instnamer -load ${BUILD_DIR}/libstatic_wp_lava.so -wpgen benchmarks/${SAMPLE}.bc -o /dev/null
-dot -Tpng cfg.hello.dot -o hello.png
+opt${LLVM_VERSION_ATTR} -instnamer -load ../${BUILD_DIR}/libstatic_wp_lava.so -wpgen ${name}.bc -o /dev/null > /dev/null
+done

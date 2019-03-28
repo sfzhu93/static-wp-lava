@@ -84,8 +84,10 @@ namespace {
         }
 
         Node::NodePtr handleFunctionCall(Function& function) {
+            Node::NodePtr expr;
             auto nullret = Node::CreateVar(std::string(""));
             outs() << "In Function:" << function.getName() << "()\n";
+            this->wpPrinter.setFuncName(function.getName());
             if(function.isDeclaration())
             {
                 return nullret;
@@ -96,6 +98,7 @@ namespace {
                 const std::vector<BasicBlock *> &SCCBBs = *BB;
                 for (std::vector<BasicBlock *>::const_iterator BBI = SCCBBs.begin(); BBI != SCCBBs.end(); ++BBI) {
                     outs() << "In BB:" << (*BBI)->getName() << "\n";
+                    this->wpPrinter.setBlockName((*BBI)->getName());
                     for (BasicBlock::reverse_iterator Ins = (*BBI)->rbegin(); Ins != (*BBI)->rend(); ++Ins) {
                         Instruction &instruction = *Ins;
                         instruction.print(outs());
@@ -115,6 +118,7 @@ namespace {
                                 this->WP = Node::CreateBinOp(Node::CreateVar(std::string(prev_var_name)),
                                                              Node::CreateConst(std::string("1234567")),
                                                              std::string("<"));
+                                expr = this->WP;
                                 //_init_var < magic number
 
                             }
@@ -127,7 +131,7 @@ namespace {
                                 case Instruction::Ret: {//TODO: handle same varibale names in different scopes
                                     tmp_expr = Node::CreateVar("_ret_");
                                     auto retins = cast<ReturnInst>(&instruction);
-                                    handleRet(*retins, this->WP);
+                                    handleRet(*retins, expr);
                                     break;
                                 }
 
@@ -135,7 +139,7 @@ namespace {
                                     auto brins = cast<BranchInst>(&instruction);
                                     outs()<<"Number of ops: "<<brins->getNumOperands()<<"\n";
                                     outs()<<"Number of succs: "<<brins->getNumSuccessors()<<"\n";
-                                    handleBranch(*brins, this->WP);
+                                    handleBranch(*brins, expr);
                                 }
                                     break;
 
@@ -178,7 +182,7 @@ namespace {
                                 case Instruction::FRem:
                                 {
                                     auto binins = cast<BinaryOperator>(&instruction);
-                                    handleBinaryOperator(*binins, this->WP);
+                                    handleBinaryOperator(*binins, expr);
 
                                     //outs()<<"Op0 Name: "<<instruction.getOperand(0)->getName()<<"\n";
                                     break;
@@ -188,7 +192,7 @@ namespace {
                                     auto bitwiseinst = cast<BinaryOperator>(&instruction);
                                     auto width = bitwiseinst->getType()->getIntegerBitWidth();
                                     if (width == 1){
-                                        handleLogicOp(*bitwiseinst, this->WP);
+                                        handleLogicOp(*bitwiseinst, expr);
                                     }
                                     outs()<<"bit width: "<<std::to_string(width)<<"\n";
                                     break;
@@ -203,14 +207,14 @@ namespace {
                                 }
                                 case Instruction::GetElementPtr: {
                                     auto gepins = cast<GetElementPtrInst>(&instruction);
-                                    handleGetElementPtr(*gepins, this->WP);
+                                    handleGetElementPtr(*gepins, expr);
                                     break;
                                 }
                                 case Instruction::Load: {
                                     auto loadins = cast<LoadInst>(&instruction);
                                     outs()<<"In loadIns: \n";
                                     this->printOperandNames(instruction);
-                                    handleLoad(*loadins, this->WP);
+                                    handleLoad(*loadins, expr);
                                     break;
                                 }
 
@@ -228,7 +232,7 @@ namespace {
                                 case Instruction::FPExt:
                                 case Instruction::ZExt:
                                 case Instruction::SExt: {
-                                    Node::substitute(this->WP, instruction.getName(),
+                                    Node::substitute(expr, instruction.getName(),
                                                      Node::CreateVar(instruction.getOperand(0)->getName()));
                                     //TODO: should we add the semantics of floating point numbers into constraints?
                                     break;
@@ -240,7 +244,7 @@ namespace {
                                 case Instruction::FPToSI:
                                 {
                                     auto castinst = cast<CastInst>(&instruction);
-                                    handleCast(*castinst, this->WP);
+                                    handleCast(*castinst, expr);
                                     //TODO: generate to_real and to_int
                                     break;
                                 }
@@ -275,32 +279,33 @@ namespace {
                                         outs() << i.getName()<<" ";
                                     }
                                     outs()<<"\n";
-                                    auto subsitute = this->handleFunctionCall(*func);
+                                    if (func->isDeclaration()){
+                                        continue;
+                                    }
+                                    Node::NodePtr substitute = this->handleFunctionCall(*func);
                                     auto p = func->arg_begin();
                                     auto q = callins->op_begin();
                                     for (;p!=func->arg_end() && q!= callins->op_end(); p++, q++)
                                     {
-                                        auto expr = HandleConstOrVar(*q);
-                                        outs() <<"substitute call sites: " << p->getName()<< " " << expr->ToString()<<"\n";
-                                        Node::substitute(this->WP, p->getName(), expr);
+                                        auto arg_val = HandleConstOrVar(*q);
+                                        outs() <<"substitute call sites: " << p->getName()<< " " << arg_val->ToString()<<"\n";
+                                        Node::substitute(expr, p->getName(), arg_val);
                                     }
                                     //TODO: define a var called __ret_val__ for substitution
                                     break;
                                 }
                                 case Instruction::Select: {//from WP to (cond and WP[aug1/lhs] or not cond and WP[aug2/lhs])
                                     auto selectins = cast<SelectInst>(&instruction);
-                                    handleSelect(*selectins, this->WP);
+                                    handleSelect(*selectins, expr);
                                     break;
                                 }
-
-
                                     /*case Instruction::And:
                                     case Instruction::Or:
                                     case Instruction::Xor:*/
                                 case Instruction::ICmp: //WP[(aug0 predicate aug1)/lhs]
                                 {
                                     auto cmpins = cast<ICmpInst>(&instruction);
-                                    handleICmp(*cmpins, this->WP);
+                                    handleICmp(*cmpins, expr);
                                     break;
                                 }
 
@@ -308,7 +313,7 @@ namespace {
                                 case Instruction::FCmp:
                                 {
                                     auto fcmpinst = cast<FCmpInst>(&instruction);
-                                    handleFCmp(*fcmpinst, this->WP);
+                                    handleFCmp(*fcmpinst, expr);
                                 }
                                 case Instruction::LandingPad: {
                                     outs()<<"unimplemented instr\n";
@@ -319,7 +324,7 @@ namespace {
                                 case Instruction::PHI: {
                                     this->printOperandNames(instruction);
                                     auto phiins = cast<PHINode>(&instruction);
-                                    handlePHI(*phiins, this->WP);
+                                    handlePHI(*phiins, expr);
                                     }
                                     break;
                                 default:
@@ -327,14 +332,13 @@ namespace {
                                     break;
                             }
                             //instruction.dump();
-                            auto wpstring = this->WP->ToString();
+                            auto wpstring = expr->ToString();
                             outs() << "WP: " << wpstring << "\n";
                             std::string inststr;
                             llvm::raw_string_ostream rso(inststr);
                             instruction.print(rso);
                             this->wpPrinter.emit(inststr, wpstring);
                         }
-
                     }
                 }
             }
@@ -346,7 +350,6 @@ namespace {
             this->wpPrinter.open(std::string(M.getName())+std::string("_wp.md"));
             for (Function &F : M) {
                 this->handleFunctionCall(F);
-
             }
             this->wpPrinter.close();
             return false;
