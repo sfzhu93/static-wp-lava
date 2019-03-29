@@ -9,9 +9,9 @@
 # In block entry, function max2
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   ret i32 %a.b | UPred( a.b ) |
-|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred( a )) or ((not cmp) and UPred( b ))) |
-|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred( a )) or ((not (a > b)) and UPred( b ))) |
+|   ret i32 %a.b | UPred(a.b) |
+|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred(a)) or ((not cmp) and UPred(b))) |
+|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred(a)) or ((not (a > b)) and UPred(b))) |
 # In block entry, function hello
 | LLVM Instruction | Precondition |
 |-----|-----|
@@ -24,9 +24,9 @@
 # In block entry, function max2
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   ret i32 %a.b | UPred( a.b ) |
-|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred( a )) or ((not cmp) and UPred( b ))) |
-|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred( a )) or ((not (a > b)) and UPred( b ))) |
+|   ret i32 %a.b | UPred(a.b) |
+|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred(a)) or ((not cmp) and UPred(b))) |
+|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred(a)) or ((not (a > b)) and UPred(b))) |
 # In block entry, function hello
 | LLVM Instruction | Precondition |
 |-----|-----|

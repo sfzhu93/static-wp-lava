@@ -9,27 +9,27 @@
 # In block entry, function max
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   ret i32 %call3 | UPred( call3 ) |
+|   ret i32 %call3 | UPred(call3) |
 # In block entry, function max2
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   ret i32 %a.b | UPred( a.b ) |
-|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred( a )) or ((not cmp) and UPred( b ))) |
-|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred( a )) or ((not (a > b)) and UPred( b ))) |
+|   ret i32 %a.b | UPred(a.b) |
+|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred(a)) or ((not cmp) and UPred(b))) |
+|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred(a)) or ((not (a > b)) and UPred(b))) |
 # In block entry, function max
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   %call3 = tail call i32 @max2(i32 %call1, i32 %c) | (((call1 > c) and UPred( call1 )) or ((not (call1 > c)) and UPred( c ))) |
+|   %call3 = tail call i32 @max2(i32 %call1, i32 %c) | (((call1 > c) and UPred(call1)) or ((not (call1 > c)) and UPred(c))) |
 # In block entry, function max2
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   ret i32 %a.b | UPred( a.b ) |
-|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred( a )) or ((not cmp) and UPred( b ))) |
-|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred( a )) or ((not (a > b)) and UPred( b ))) |
+|   ret i32 %a.b | UPred(a.b) |
+|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred(a)) or ((not cmp) and UPred(b))) |
+|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred(a)) or ((not (a > b)) and UPred(b))) |
 # In block entry, function max
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   %call1 = tail call i32 @max2(i32 %a, i32 %b) | (((a > b) and (((a > c) and UPred( a )) or ((not (a > c)) and UPred( c )))) or ((not (a > b)) and (((b > c) and UPred( b )) or ((not (b > c)) and UPred( c ))))) |
+|   %call1 = tail call i32 @max2(i32 %a, i32 %b) | (((a > b) and (((a > c) and UPred(a)) or ((not (a > c)) and UPred(c)))) or ((not (a > b)) and (((b > c) and UPred(b)) or ((not (b > c)) and UPred(c))))) |
 # In block entry, function hello
 | LLVM Instruction | Precondition |
 |-----|-----|
@@ -42,27 +42,27 @@
 # In block entry, function max
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   ret i32 %call3 | UPred( call3 ) |
+|   ret i32 %call3 | UPred(call3) |
 # In block entry, function max2
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   ret i32 %a.b | UPred( a.b ) |
-|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred( a )) or ((not cmp) and UPred( b ))) |
-|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred( a )) or ((not (a > b)) and UPred( b ))) |
+|   ret i32 %a.b | UPred(a.b) |
+|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred(a)) or ((not cmp) and UPred(b))) |
+|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred(a)) or ((not (a > b)) and UPred(b))) |
 # In block entry, function max
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   %call3 = tail call i32 @max2(i32 %call1, i32 %c) | (((call1 > c) and UPred( call1 )) or ((not (call1 > c)) and UPred( c ))) |
+|   %call3 = tail call i32 @max2(i32 %call1, i32 %c) | (((call1 > c) and UPred(call1)) or ((not (call1 > c)) and UPred(c))) |
 # In block entry, function max2
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   ret i32 %a.b | UPred( a.b ) |
-|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred( a )) or ((not cmp) and UPred( b ))) |
-|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred( a )) or ((not (a > b)) and UPred( b ))) |
+|   ret i32 %a.b | UPred(a.b) |
+|   %a.b = select i1 %cmp, i32 %a, i32 %b | ((cmp and UPred(a)) or ((not cmp) and UPred(b))) |
+|   %cmp = icmp sgt i32 %a, %b | (((a > b) and UPred(a)) or ((not (a > b)) and UPred(b))) |
 # In block entry, function max
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   %call1 = tail call i32 @max2(i32 %a, i32 %b) | (((a > b) and (((a > c) and UPred( a )) or ((not (a > c)) and UPred( c )))) or ((not (a > b)) and (((b > c) and UPred( b )) or ((not (b > c)) and UPred( c ))))) |
+|   %call1 = tail call i32 @max2(i32 %a, i32 %b) | (((a > b) and (((a > c) and UPred(a)) or ((not (a > c)) and UPred(c)))) or ((not (a > b)) and (((b > c) and UPred(b)) or ((not (b > c)) and UPred(c))))) |
 # In block entry, function hello
 | LLVM Instruction | Precondition |
 |-----|-----|

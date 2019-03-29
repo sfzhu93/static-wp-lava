@@ -63,16 +63,7 @@ namespace WpExpr{
                 case VAR:
                     return this->value;
                 case UPRED:
-                    std::string leftstr, rightstr;
-                    if (this->left)
-                    {
-                        leftstr = this->left->ToString();
-                    }
-                    if (this->right)
-                    {
-                        rightstr = this->right->ToString();
-                    }
-                    return "UPred("+leftstr+ " " + this->value + " " +rightstr + ")";
+                    return "UPred("+ this->left->ToString() + ")";
             }
             return ret;
         }
@@ -91,16 +82,7 @@ namespace WpExpr{
                 case VAR:
                     return this->value;
                 case UPRED:
-                    std::string leftstr, rightstr;
-                    if (this->left)
-                    {
-                        leftstr = this->left->ToString();
-                    }
-                    if (this->right)
-                    {
-                        rightstr = this->right->ToString();
-                    }
-                    return "UPred("+ this->value + leftstr+ " " +rightstr + ")";
+                    return "UPred("+ this->left->ToString() + ")";
             }
             return ret;
         }
@@ -128,9 +110,10 @@ namespace WpExpr{
         }
 
         static NodePtr CreateUndeterminedPredicate(std::string name) {
-            return std::make_shared<Node>(UPRED, NodePtr(),
-                                          NodePtr(), std::move(name));
-
+            auto varnode = CreateVar(std::move(name));
+            auto upred =  std::make_shared<Node>(UPRED, std::move(varnode),
+                                                 NodePtr(), std::move(std::string("")));
+            return upred;
         }
 
         /**
@@ -141,13 +124,17 @@ namespace WpExpr{
          * @return Returns the upred.
          */
         static void fillUndeterminedPredicate(NodePtr &upred, const NodePtr &expr, const std::string &retValName) {
+            if (!upred)
+            {
+                return;
+            }
             switch (upred->type) {
                 case VAR:case CONST:
                     break;
                 case UPRED: {
-                    auto name = upred->name;
+                    auto upredexpr = upred->left;
                     upred = std::make_shared<Node>(*expr);
-                    substitute(upred, retValName, Node::CreateVar(std::move(name)));
+                    substitute(upred, retValName, upredexpr);
                     break;
                 }
                 case BINOP:
@@ -161,6 +148,10 @@ namespace WpExpr{
         }
 
         static NodePtr substitute(NodePtr &src, const std::string &name, const NodePtr &expr) {
+            if (!src)
+            {
+                return src;
+            }
             switch (src->type) {
                 case VAR:
                     if (src->name == name)//|| src->name == WpExpr::wp_init_var
@@ -170,18 +161,10 @@ namespace WpExpr{
                         //TODO: warning nothing substituted
                     }
                     break;
-                case UPRED:
-                    if (src->name == name)//|| src->name == WpExpr::wp_init_var
-                    {
-                        src = std::make_shared<Node>(*expr);
-                        src->type = UPRED;
-                    } else {
-                        //TODO: warning nothing substituted
-                    }
-                    break;
                 case CONST:
                     //TODO: warning nothing substituted
                     break;
+                case UPRED:
                 case UNIOP:
                     substitute(src->left, name, expr);
                     break;
