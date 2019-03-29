@@ -1,11 +1,11 @@
-; ModuleID = 'benchmarks/control_flow.bc'
+; ModuleID = 'control_flow.bc'
 target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
 @.str = private unnamed_addr constant [2 x i8] c".\00", align 1
 @.str.1 = private unnamed_addr constant [4 x i8] c"119\00", align 1
 @.str.3 = private unnamed_addr constant [41 x i8] c"(\22C should be greater than 45\22, c >= 45)\00", align 1
-@.str.4 = private unnamed_addr constant [26 x i8] c"benchmarks/control_flow.c\00", align 1
+@.str.4 = private unnamed_addr constant [15 x i8] c"control_flow.c\00", align 1
 @__PRETTY_FUNCTION__.hello = private unnamed_addr constant [25 x i8] c"int hello(int, int, int)\00", align 1
 
 ; Function Attrs: noinline nounwind uwtable
@@ -49,7 +49,7 @@ entry:
   br i1 %cmp7, label %cond.end, label %cond.false
 
 cond.false:                                       ; preds = %entry
-  tail call void @__assert_fail(i8* getelementptr inbounds ([41 x i8], [41 x i8]* @.str.3, i64 0, i64 0), i8* getelementptr inbounds ([26 x i8], [26 x i8]* @.str.4, i64 0, i64 0), i32 24, i8* getelementptr inbounds ([25 x i8], [25 x i8]* @__PRETTY_FUNCTION__.hello, i64 0, i64 0)) #4
+  tail call void @__assert_fail(i8* getelementptr inbounds ([41 x i8], [41 x i8]* @.str.3, i64 0, i64 0), i8* getelementptr inbounds ([15 x i8], [15 x i8]* @.str.4, i64 0, i64 0), i32 24, i8* getelementptr inbounds ([25 x i8], [25 x i8]* @__PRETTY_FUNCTION__.hello, i64 0, i64 0)) #4
   unreachable
 
 cond.end:                                         ; preds = %entry

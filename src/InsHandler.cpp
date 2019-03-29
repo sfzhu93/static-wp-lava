@@ -110,7 +110,7 @@ void handleBranch(BranchInst &inst, Node::NodePtr &expr) {
         auto br1 = inst.getSuccessor(0)->getName();
         auto br2 = inst.getSuccessor(1)->getName();
         Node::substitute(expr, br1, Node::CreateVar(cond));
-        Node::substitute(expr, br2, Node::CreateUniOp(Node::CreateVar(cond), "NOT"));
+        Node::substitute(expr, br2, Node::CreateUniOp(Node::CreateVar(cond), "not"));
     }else { //unconditional. TODO: replace dest name with basic block's name
 
     }

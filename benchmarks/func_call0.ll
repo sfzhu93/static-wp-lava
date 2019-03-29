@@ -1,4 +1,4 @@
-; ModuleID = 'func_call1.bc'
+; ModuleID = 'func_call0.bc'
 target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
@@ -27,36 +27,27 @@ entry:
   ret i32 %a.b
 }
 
-; Function Attrs: nounwind readnone uwtable
-define i32 @max(i32 %a, i32 %b, i32 %c) #1 {
-entry:
-  %call1 = tail call i32 @max2(i32 %a, i32 %b)
-  %call3 = tail call i32 @max2(i32 %call1, i32 %c)
-  ret i32 %call3
-}
-
 ; Function Attrs: nounwind uwtable
-define i32 @hello(i32 %a, i32 %b, i32 %c, i32 %d) #2 {
+define i32 @hello(i32 %a, i32 %b, i32 %c) #2 {
 entry:
   tail call void @_wp_begin()
-  %cmp = icmp sgt i32 %d, 0
+  %cmp = icmp sgt i32 %c, 0
   br i1 %cmp, label %if.then, label %if.else
 
 if.then:                                          ; preds = %entry
-  %call = tail call i32 @max(i32 %a, i32 %b, i32 %c)
+  %call = tail call i32 @max2(i32 %a, i32 %b)
   br label %if.end
 
 if.else:                                          ; preds = %entry
   %sub = sub nsw i32 0, %a
   %sub1 = sub nsw i32 0, %b
-  %sub2 = sub nsw i32 0, %c
-  %call3 = tail call i32 @max(i32 %sub, i32 %sub1, i32 %sub2)
-  %sub4 = sub nsw i32 0, %call3
+  %call2 = tail call i32 @max2(i32 %sub, i32 %sub1)
+  %sub3 = sub nsw i32 0, %call2
   br label %if.end
 
 if.end:                                           ; preds = %if.else, %if.then
-  %ret.0 = phi i32 [ %call, %if.then ], [ %sub4, %if.else ]
-  %call5 = tail call i8* @_wp_end(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.1, i64 0, i64 0))
+  %ret.0 = phi i32 [ %call, %if.then ], [ %sub3, %if.else ]
+  %call4 = tail call i8* @_wp_end(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.1, i64 0, i64 0))
   ret i32 %ret.0
 }
 

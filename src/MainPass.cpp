@@ -85,11 +85,10 @@ namespace {
 
         Node::NodePtr handleFunctionCall(Function& function) {
             Node::NodePtr expr;
-            auto nullret = Node::CreateVar(std::string(""));
             outs() << "In Function:" << function.getName() << "()\n";
             this->wpPrinter.setFuncName(function.getName());
             if (function.isDeclaration()) {
-                return nullret;
+                return expr;
             }
             Node::NodePtr tmp_expr = std::make_shared<Node>();
 
@@ -114,10 +113,9 @@ namespace {
                             if (funcName == "_wp_end") {
                                 this->InWP = true;
                                 auto prev_var_name = instruction.getPrevNode()->getName();
-                                this->WP = Node::CreateBinOp(Node::CreateVar(std::string(prev_var_name)),
-                                                             Node::CreateConst(std::string("1234567")),
-                                                             std::string("<"));
-                                expr = this->WP;
+                                expr = Node::CreateBinOp(Node::CreateVar(std::string(prev_var_name)),
+                                                         Node::CreateConst(std::string("1234567")),
+                                                         std::string("<"));;
                                 //_init_var < magic number
 
                             }
@@ -265,7 +263,7 @@ namespace {
                                     if (func->getName() == "_wp_begin") {
                                         outs() << "_wp_begin\n";
                                         this->InWP = false;
-                                        outs() << this->WP->ToSMTLanguage() << "\n";
+                                        outs() << expr->ToSMTLanguage() << "\n";
                                         continue;
                                         //TODO: solve the WP with z3
                                     }
@@ -279,6 +277,7 @@ namespace {
                                         continue;
                                     }
                                     Node::NodePtr udexpr = this->handleFunctionCall(*func);
+                                    this->wpPrinter.setFuncName(function.getName());
                                     if (udexpr) {
                                         auto p = func->arg_begin();
                                         auto q = callins->op_begin();
@@ -332,12 +331,14 @@ namespace {
                                     break;
                             }
                             //instruction.dump();
-                            auto wpstring = expr->ToString();
-                            outs() << "WP: " << wpstring << "\n";
-                            std::string inststr;
-                            llvm::raw_string_ostream rso(inststr);
-                            instruction.print(rso);
-                            this->wpPrinter.emit(inststr, wpstring);
+                            if (expr) {
+                                auto wpstring = expr->ToString();
+                                outs() << "WP: " << wpstring << "\n";
+                                std::string inststr;
+                                llvm::raw_string_ostream rso(inststr);
+                                instruction.print(rso);
+                                this->wpPrinter.emit(inststr, wpstring);
+                            }
                         }
                     }
                 }
@@ -349,7 +350,10 @@ namespace {
             std::cout<<"init\n";
             this->wpPrinter.open(std::string(M.getName())+std::string("_wp.md"));
             for (Function &F : M) {
-                this->handleFunctionCall(F);
+                auto ret = this->handleFunctionCall(F);
+                if (ret){
+                    outs()<<ret->ToString()<<"\n";
+                }
             }
             this->wpPrinter.close();
             return false;
