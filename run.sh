@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-SAMPLE=sort3
+SAMPLE=func_call1
 #SAMPLE=lava1
 #SAMPLE=switch_tax_calc
 #SAMPLE=herons_formula

@@ -21,12 +21,12 @@
 # In block entry, function f
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   ret i32 %add | ((if.then and (((add * c) * (((c + -1) * (b + -1)) * (add + -1))) < 1234567)) or (if.else and (((add * c) * (add * b)) < 1234567))) |
-|   %add = add nsw i32 %a, 1 | ((if.then and ((((a + 1) * c) * (((c + -1) * (b + -1)) * ((a + 1) + -1))) < 1234567)) or (if.else and ((((a + 1) * c) * ((a + 1) * b)) < 1234567))) |
-|   %call = tail call i32 @f(i32 %add) | ((if.then and ((((add + 1) * c) * (((c + -1) * (b + -1)) * ((add + 1) + -1))) < 1234567)) or (if.else and ((((add + 1) * c) * ((add + 1) * b)) < 1234567))) |
+|   ret i32 %add | UPred( add ) |
+|   %add = add nsw i32 %a, 1 | UPred(a + 1) |
+|   %call = tail call i32 @f(i32 %add) | ((if.then and (((add * c) * (((c + -1) * (b + -1)) * (add + -1))) < 1234567)) or (if.else and (((add * c) * (+ * b)) < 1234567))) |
 # In block entry, function f
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   br i1 %cmp, label %if.then, label %if.else | ((cmp and ((((add + 1) * c) * (((c + -1) * (b + -1)) * ((add + 1) + -1))) < 1234567)) or ((NOT cmp) and ((((add + 1) * c) * ((add + 1) * b)) < 1234567))) |
-|   %cmp = icmp sgt i32 %add, 2 | (((add > 2) and ((((add + 1) * c) * (((c + -1) * (b + -1)) * ((add + 1) + -1))) < 1234567)) or ((NOT (add > 2)) and ((((add + 1) * c) * ((add + 1) * b)) < 1234567))) |
-|   %add = add nsw i32 %c, %b | ((((c + b) > 2) and (((((c + b) + 1) * c) * (((c + -1) * (b + -1)) * (((c + b) + 1) + -1))) < 1234567)) or ((NOT ((c + b) > 2)) and (((((c + b) + 1) * c) * (((c + b) + 1) * b)) < 1234567))) |
+|   br i1 %cmp, label %if.then, label %if.else | ((cmp and (((add * c) * (((c + -1) * (b + -1)) * (add + -1))) < 1234567)) or ((NOT cmp) and (((add * c) * (+ * b)) < 1234567))) |
+|   %cmp = icmp sgt i32 %add, 2 | (((add > 2) and (((add * c) * (((c + -1) * (b + -1)) * (add + -1))) < 1234567)) or ((NOT (add > 2)) and (((add * c) * (+ * b)) < 1234567))) |
+|   %add = add nsw i32 %c, %b | ((((c + b) > 2) and ((((c + b) * c) * (((c + -1) * (b + -1)) * ((c + b) + -1))) < 1234567)) or ((NOT ((c + b) > 2)) and ((((c + b) * c) * (+ * b)) < 1234567))) |

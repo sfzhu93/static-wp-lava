@@ -88,8 +88,7 @@ namespace {
             auto nullret = Node::CreateVar(std::string(""));
             outs() << "In Function:" << function.getName() << "()\n";
             this->wpPrinter.setFuncName(function.getName());
-            if(function.isDeclaration())
-            {
+            if (function.isDeclaration()) {
                 return nullret;
             }
             Node::NodePtr tmp_expr = std::make_shared<Node>();
@@ -122,9 +121,9 @@ namespace {
                                 //_init_var < magic number
 
                             }
-                        }else if (this->InWP) {
+                        } else if (this->InWP) {
                             outs() << "InWP: ";
-                            assert(instruction.getOpcode()==opcode);
+                            assert(instruction.getOpcode() == opcode);
                             //opcode = instruction.getOpcode();
                             switch (opcode) {
                                 // Terminator instructions
@@ -137,37 +136,34 @@ namespace {
 
                                 case Instruction::Br: {
                                     auto brins = cast<BranchInst>(&instruction);
-                                    outs()<<"Number of ops: "<<brins->getNumOperands()<<"\n";
-                                    outs()<<"Number of succs: "<<brins->getNumSuccessors()<<"\n";
+                                    outs() << "Number of ops: " << brins->getNumOperands() << "\n";
+                                    outs() << "Number of succs: " << brins->getNumSuccessors() << "\n";
                                     handleBranch(*brins, expr);
                                 }
                                     break;
 
-                                case Instruction::Switch:{//O1 won't generate switch
-                                    outs()<<"unimplemented instr\n";
+                                case Instruction::Switch: {//O1 won't generate switch
+                                    outs() << "unimplemented instr\n";
                                     break;
                                 }
 
-                                case Instruction::IndirectBr:
-                                {
-                                    outs()<<"unimplemented instr\n";
+                                case Instruction::IndirectBr: {
+                                    outs() << "unimplemented instr\n";
                                     break;
                                 }
 
-                                case Instruction::Invoke:
-                                {
-                                    outs()<<"unimplemented instr\n";
+                                case Instruction::Invoke: {
+                                    outs() << "unimplemented instr\n";
                                     break;
                                 }
 
-                                case Instruction::Resume:
-                                {
-                                    outs()<<"unimplemented instr\n";
+                                case Instruction::Resume: {
+                                    outs() << "unimplemented instr\n";
                                     break;
                                 }
-                                // Unary Operations
+                                    // Unary Operations
 
-                                // Binary Operations
+                                    // Binary Operations
                                 case Instruction::Add:
                                 case Instruction::FAdd:
                                 case Instruction::Sub:
@@ -179,8 +175,7 @@ namespace {
                                 case Instruction::FDiv:
                                 case Instruction::URem:
                                 case Instruction::SRem:
-                                case Instruction::FRem:
-                                {
+                                case Instruction::FRem: {
                                     auto binins = cast<BinaryOperator>(&instruction);
                                     handleBinaryOperator(*binins, expr);
 
@@ -188,21 +183,22 @@ namespace {
                                     break;
                                 }
 //todo: bitwise operations
-                                case Instruction::And:case Instruction::Or: {
+                                case Instruction::And:
+                                case Instruction::Or: {
                                     auto bitwiseinst = cast<BinaryOperator>(&instruction);
                                     auto width = bitwiseinst->getType()->getIntegerBitWidth();
-                                    if (width == 1){
+                                    if (width == 1) {
                                         handleLogicOp(*bitwiseinst, expr);
                                     }
-                                    outs()<<"bit width: "<<std::to_string(width)<<"\n";
+                                    outs() << "bit width: " << std::to_string(width) << "\n";
                                     break;
                                 }
 
 //TODO: vectors?
 
-                                // Memory
+                                    // Memory
                                 case Instruction::Alloca: {
-                                    outs()<<"unimplemented instr\n";
+                                    outs() << "unimplemented instr\n";
                                     break;
                                 }
                                 case Instruction::GetElementPtr: {
@@ -212,23 +208,24 @@ namespace {
                                 }
                                 case Instruction::Load: {
                                     auto loadins = cast<LoadInst>(&instruction);
-                                    outs()<<"In loadIns: \n";
+                                    outs() << "In loadIns: \n";
                                     this->printOperandNames(instruction);
                                     handleLoad(*loadins, expr);
                                     break;
                                 }
 
                                 case Instruction::Store: {
-                                    outs()<<"unimplemented instr\n";
+                                    outs() << "unimplemented instr\n";
                                     break;
                                 }
                                 case Instruction::Fence: {
-                                    outs()<<"unimplemented instr\n";
+                                    outs() << "unimplemented instr\n";
                                     break;
                                 }
 
-                                //conversion
-                                case Instruction::Trunc: case Instruction::FPTrunc:
+                                    //conversion
+                                case Instruction::Trunc:
+                                case Instruction::FPTrunc:
                                 case Instruction::FPExt:
                                 case Instruction::ZExt:
                                 case Instruction::SExt: {
@@ -241,8 +238,7 @@ namespace {
                                 case Instruction::UIToFP:
                                 case Instruction::SIToFP:
                                 case Instruction::FPToUI:
-                                case Instruction::FPToSI:
-                                {
+                                case Instruction::FPToSI: {
                                     auto castinst = cast<CastInst>(&instruction);
                                     handleCast(*castinst, expr);
                                     //TODO: generate to_real and to_int
@@ -250,46 +246,51 @@ namespace {
                                 }
 
                                 case Instruction::PtrToInt:
-                                case Instruction::IntToPtr: case Instruction::BitCast:
+                                case Instruction::IntToPtr:
+                                case Instruction::BitCast:
                                 case Instruction::AddrSpaceCast: {
-                                    outs()<<"unimplemented instr\n";
+                                    outs() << "unimplemented instr\n";
                                     break;
                                 }
 
-                                //Other
+                                    //Other
                                 case Instruction::Call: {//TODO: handle variable length args and lazy args
                                     //TODO: handle same variable names in different scopes
                                     auto callins = cast<CallInst>(&instruction);
                                     auto lhs = callins->getName();
-                                    outs()<<"call site values: ";
+                                    outs() << "call site values: ";
                                     this->printOperandNames(*callins);
-                                    outs()<<lhs<<"\n";
+                                    outs() << lhs << "\n";
                                     auto func = callins->getCalledFunction();
                                     if (func->getName() == "_wp_begin") {
                                         outs() << "_wp_begin\n";
                                         this->InWP = false;
-                                        outs()<<this->WP->ToSMTLanguage()<<"\n";
+                                        outs() << this->WP->ToSMTLanguage() << "\n";
                                         continue;
                                         //TODO: solve the WP with z3
                                     }
-                                        outs()<<"#arg: "<<func->arg_size()<<"\n";
-                                    outs()<<"call site args: ";
-                                    for (Argument &i :func->args())
-                                    {
-                                        outs() << i.getName()<<" ";
+                                    outs() << "#arg: " << func->arg_size() << "\n";
+                                    outs() << "call site args: ";
+                                    for (Argument &i :func->args()) {
+                                        outs() << i.getName() << " ";
                                     }
-                                    outs()<<"\n";
-                                    if (func->isDeclaration()){
+                                    outs() << "\n";
+                                    if (func->isDeclaration()) {
                                         continue;
                                     }
-                                    Node::NodePtr substitute = this->handleFunctionCall(*func);
-                                    auto p = func->arg_begin();
-                                    auto q = callins->op_begin();
-                                    for (;p!=func->arg_end() && q!= callins->op_end(); p++, q++)
-                                    {
-                                        auto arg_val = HandleConstOrVar(*q);
-                                        outs() <<"substitute call sites: " << p->getName()<< " " << arg_val->ToString()<<"\n";
-                                        Node::substitute(expr, p->getName(), arg_val);
+                                    Node::NodePtr udexpr = this->handleFunctionCall(*func);
+                                    if (udexpr) {
+                                        auto p = func->arg_begin();
+                                        auto q = callins->op_begin();
+                                        for (; p != func->arg_end() && q != callins->op_end(); p++, q++) {
+                                            auto arg_val = HandleConstOrVar(*q);
+                                            outs() << "substitute call sites: " << p->getName() << " "
+                                                   << arg_val->ToString() << "\n";
+                                            Node::substitute(udexpr, p->getName(), arg_val);
+                                        }
+                                        outs() << "substituted udexpr:" << udexpr->ToString() << "\n";
+                                        Node::fillUndeterminedPredicate(udexpr, expr, lhs);
+                                        expr = udexpr;
                                     }
                                     //TODO: define a var called __ret_val__ for substitution
                                     break;
@@ -310,13 +311,12 @@ namespace {
                                 }
 
                                 case Instruction::VAArg:
-                                case Instruction::FCmp:
-                                {
+                                case Instruction::FCmp: {
                                     auto fcmpinst = cast<FCmpInst>(&instruction);
                                     handleFCmp(*fcmpinst, expr);
                                 }
                                 case Instruction::LandingPad: {
-                                    outs()<<"unimplemented instr\n";
+                                    outs() << "unimplemented instr\n";
                                     break;
                                 }
 
@@ -325,10 +325,10 @@ namespace {
                                     this->printOperandNames(instruction);
                                     auto phiins = cast<PHINode>(&instruction);
                                     handlePHI(*phiins, expr);
-                                    }
+                                }
                                     break;
                                 default:
-                                    outs()<<"unknown instr\n";
+                                    outs() << "unknown instr\n";
                                     break;
                             }
                             //instruction.dump();
@@ -342,7 +342,7 @@ namespace {
                     }
                 }
             }
-
+            return expr;
         }
 
         bool runOnModule(Module &M) override {

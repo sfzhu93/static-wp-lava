@@ -21,8 +21,8 @@
 # In block entry, function heron
 | LLVM Instruction | Precondition |
 |-----|-----|
-|   br i1 %or.cond40, label %if.then, label %if.end | ((or.cond40 and (call < 1234567)) or (entry and (0.000000 < 1234567))) |
-|   %or.cond40 = and i1 %cmp9, %or.cond | (((cmp9 and or.cond) and (call < 1234567)) or (entry and (0.000000 < 1234567))) |
+|   br i1 %or.cond38, label %if.then, label %if.end | ((or.cond38 and (call < 1234567)) or (entry and (0.000000 < 1234567))) |
+|   %or.cond38 = and i1 %cmp9, %or.cond | (((cmp9 and or.cond) and (call < 1234567)) or (entry and (0.000000 < 1234567))) |
 |   %cmp9 = fcmp ogt double %add8, %b | ((((add8 ogt b) and or.cond) and (call < 1234567)) or (entry and (0.000000 < 1234567))) |
 |   %add8 = fadd double %a, %c | (((((a + c) ogt b) and or.cond) and (call < 1234567)) or (entry and (0.000000 < 1234567))) |
 |   %or.cond = and i1 %cmp, %cmp5 | (((((a + c) ogt b) and (cmp and cmp5)) and (call < 1234567)) or (entry and (0.000000 < 1234567))) |

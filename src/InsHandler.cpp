@@ -98,7 +98,8 @@ void handleRet(ReturnInst &inst, Node::NodePtr &expr) {
                          std::string("call"),//TODO: replace __ret_val__
                          Node::CreateVar(inst.getReturnValue()->getName()));*/
 
-    }
+    } else
+        expr = Node::NodePtr();
 }
 
 void handleBranch(BranchInst &inst, Node::NodePtr &expr) {
