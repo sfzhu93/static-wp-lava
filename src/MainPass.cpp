@@ -40,6 +40,8 @@ namespace {
         WpExpr::Node::NodePtr WP;
         bool InWP = false;
         std::unordered_map<std::uintptr_t, int> naming_map;
+        std::unordered_map<std::uintptr_t, int> visitedFunc;
+        std::unordered_map<std::uintptr_t, bool > isPureFunc;
         WpPrinter wpPrinter;
 
         int naming_index = 0;
@@ -94,7 +96,7 @@ namespace {
 
             for (scc_iterator<Function *> BB = scc_begin(&function), BBE = scc_end(&function); BB != BBE; ++BB) {
                 const std::vector<BasicBlock *> &SCCBBs = *BB;
-                for (std::vector<BasicBlock *>::const_iterator BBI = SCCBBs.begin(); BBI != SCCBBs.end(); ++BBI) {
+                for (auto BBI = SCCBBs.begin(); BBI != SCCBBs.end(); ++BBI) {
                     outs() << "In BB:" << (*BBI)->getName() << "\n";
                     this->wpPrinter.setBlockName((*BBI)->getName());
                     for (BasicBlock::reverse_iterator Ins = (*BBI)->rbegin(); Ins != (*BBI)->rend(); ++Ins) {
@@ -117,7 +119,6 @@ namespace {
                                                          Node::CreateConst(std::string("1234567")),
                                                          std::string("<"));;
                                 //_init_var < magic number
-
                             }
                         } else if (this->InWP) {
                             outs() << "InWP: ";

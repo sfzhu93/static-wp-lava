@@ -48,7 +48,7 @@ Node::NodePtr HandleConstOrVar(Value *value) {
         }
     }else//return the variable name
     {
-        ret = Node::CreateVar(value->getName());//TODO: would move fuck up here?
+        ret = Node::CreateVar(value->getName());//TODO: check if move works well here
     }
     return ret;
 }
@@ -60,6 +60,10 @@ Node::NodePtr HandleConstOrVar(Value *value) {
  */
 void handleGetElementPtr(GetElementPtrInst &inst, Node::NodePtr &expr) {
     auto a = inst.getOperand(0);
+    auto nops = inst.getNumOperands();
+    for (int i=0;i<nops;++i){
+        outs()<<"GEPOperand: "<<inst.getOperand(i)->getName()<<"\n";
+    }
     Node::NodePtr value;
     if (isa<GlobalVariable>(a) && a->getName()=="lava_val") {
         value = Node::CreateBinOp(
