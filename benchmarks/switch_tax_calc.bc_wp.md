@@ -12,8 +12,8 @@
 | LLVM Instruction | Precondition |
 |-----|-----|
 |   br label %sw.epilog | ((switch.lookup and ((sw.epilog and ((switch.load * salary) < 1234567)) or (entry and (-1.000000 < 1234567)))) or (if.then and ((sw.epilog and ((0.350000 * salary) < 1234567)) or (entry and (-1.000000 < 1234567))))) |
-|   %switch.load = load double, double* %switch.gep, align 8 | ((switch.lookup and ((sw.epilog and ((switch.gep * salary) < 1234567)) or (entry and (-1.000000 < 1234567)))) or (if.then and ((sw.epilog and ((0.350000 * salary) < 1234567)) or (entry and (-1.000000 < 1234567))))) |
-|   %switch.gep = getelementptr inbounds [12 x double], [12 x double]* @switch.table, i64 0, i64 %tmp1 | ((switch.lookup and ((sw.epilog and ((_ * salary) < 1234567)) or (entry and (-1.000000 < 1234567)))) or (if.then and ((sw.epilog and ((0.350000 * salary) < 1234567)) or (entry and (-1.000000 < 1234567))))) |
+|   %switch.load = load double* %switch.gep, align 8 | ((switch.lookup and ((sw.epilog and ((switch.gep * salary) < 1234567)) or (entry and (-1.000000 < 1234567)))) or (if.then and ((sw.epilog and ((0.350000 * salary) < 1234567)) or (entry and (-1.000000 < 1234567))))) |
+|   %switch.gep = getelementptr inbounds [12 x double]* @switch.table, i64 0, i64 %tmp1 | ((switch.lookup and ((sw.epilog and ((_ * salary) < 1234567)) or (entry and (-1.000000 < 1234567)))) or (if.then and ((sw.epilog and ((0.350000 * salary) < 1234567)) or (entry and (-1.000000 < 1234567))))) |
 |   %tmp1 = sext i32 %div to i64 | ((switch.lookup and ((sw.epilog and ((_ * salary) < 1234567)) or (entry and (-1.000000 < 1234567)))) or (if.then and ((sw.epilog and ((0.350000 * salary) < 1234567)) or (entry and (-1.000000 < 1234567))))) |
 # In block if.then, function calc_tax
 | LLVM Instruction | Precondition |

@@ -6,6 +6,8 @@
 #define STATIC_WP_LAVA_WPEXPR_H
 
 #include <memory>
+#include "llvm/IR/Value.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace WpExpr{
     enum NodeType {
@@ -24,10 +26,11 @@ namespace WpExpr{
         NodeType type;
         typedef std::shared_ptr<Node> NodePtr;
         NodePtr left, right;
+        llvm::Value *valueObj;
         std::string value;
         std::string &name;
 
-        Node() : name(value) {}
+        Node() : name(value),valueObj(nullptr) {}
 
         Node(Node &node) : Node() {
             this->type = node.type;
@@ -42,7 +45,7 @@ namespace WpExpr{
                 this->right = nullptr;
             }
             this->value = node.value;
-
+            this->valueObj = node.valueObj;
         }
 
         Node(NodeType type, NodePtr &&left, NodePtr &&right, std::string &&val) :
@@ -60,10 +63,17 @@ namespace WpExpr{
                     ret = "(" + this->left->ToString() + " " + this->value + " " + this->right->ToString() + ")";
                     break;
                 case CONST:
-                case VAR:
-                    return this->value;
+                    return this->name;
+                case VAR: {
+                    if (this->valueObj) {
+                        //std::string tmp_name = ;
+                        return this->valueObj->getName();
+                    }else {
+                        return this->value;
+                    }
+                }
                 case UPRED:
-                    return "UPred("+ this->left->ToString() + ")";
+                    return "UPred(" + this->left->ToString() + ")";
             }
             return ret;
         }
@@ -80,9 +90,9 @@ namespace WpExpr{
                     break;
                 case CONST:
                 case VAR:
-                    return this->value;
+                    return this->ToString();
                 case UPRED:
-                    return "UPred("+ this->left->ToString() + ")";
+                    return "UPred("+ this->left->ToSMTLanguage() + ")";
             }
             return ret;
         }
@@ -98,9 +108,18 @@ namespace WpExpr{
             return ret;
         }
 
-        static NodePtr CreateVar(std::string &&name) {
+        static NodePtr CreateVar(llvm::Value *val) {
+            auto name = val->getName();
+            auto ret = std::make_shared<Node>(VAR, NodePtr(),
+                                              NodePtr(), name);
+            ret->valueObj = val;
+            return ret;
+        }
+
+        static NodePtr CreateVar(std::string name) {
             auto ret = std::make_shared<Node>(VAR, NodePtr(),
                                               NodePtr(), std::move(name));
+            ret->valueObj = nullptr;
             return ret;
         }
 
@@ -109,8 +128,8 @@ namespace WpExpr{
                                           NodePtr(), std::move(value));
         }
 
-        static NodePtr CreateUndeterminedPredicate(std::string name) {
-            auto varnode = CreateVar(std::move(name));
+        static NodePtr CreateUndeterminedPredicate(llvm::Value *val) {
+            auto varnode = CreateVar(val);
             auto upred =  std::make_shared<Node>(UPRED, std::move(varnode),
                                                  NodePtr(), std::move(std::string("")));
             return upred;
@@ -123,7 +142,7 @@ namespace WpExpr{
          * @param retValName The name of the call instrution. It should be in expr.
          * @return Returns the upred.
          */
-        static void fillUndeterminedPredicate(NodePtr &upred, const NodePtr &expr, const std::string &retValName) {
+        static void fillUndeterminedPredicate(NodePtr &upred, const NodePtr &expr, const llvm::Value *val) {
             if (!upred)
             {
                 return;
@@ -134,27 +153,27 @@ namespace WpExpr{
                 case UPRED: {
                     auto upredexpr = upred->left;
                     upred = std::make_shared<Node>(*expr);
-                    substitute(upred, retValName, upredexpr);
+                    substitute(upred, val, upredexpr);
                     break;
                 }
                 case BINOP:
-                    fillUndeterminedPredicate(upred->right, expr, retValName);
-                    fillUndeterminedPredicate(upred->left, expr, retValName);
+                    fillUndeterminedPredicate(upred->right, expr, val);
+                    fillUndeterminedPredicate(upred->left, expr, val);
                     break;
                 case UNIOP:
-                    fillUndeterminedPredicate(upred->left, expr, retValName);
+                    fillUndeterminedPredicate(upred->left, expr, val);
                     break;
             }
         }
 
-        static NodePtr substitute(NodePtr &src, const std::string &name, const NodePtr &expr) {
+        static NodePtr substitute(NodePtr &src, const llvm::Value *val, const NodePtr &expr) {
             if (!src)
             {
                 return src;
             }
             switch (src->type) {
                 case VAR:
-                    if (src->name == name)//|| src->name == WpExpr::wp_init_var
+                    if (src->valueObj == val)//|| src->name == WpExpr::wp_init_var
                     {
                         src = expr;
                     } else {
@@ -166,11 +185,11 @@ namespace WpExpr{
                     break;
                 case UPRED:
                 case UNIOP:
-                    substitute(src->left, name, expr);
+                    substitute(src->left, val, expr);
                     break;
                 case BINOP:
-                    substitute(src->left, name, expr);
-                    substitute(src->right, name, expr);
+                    substitute(src->left, val, expr);
+                    substitute(src->right, val, expr);
                     break;
             }
             return src;

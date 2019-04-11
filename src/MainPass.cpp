@@ -114,8 +114,8 @@ namespace {
                             outs() << funcName << "\n";
                             if (funcName == "_wp_end") {
                                 this->InWP = true;
-                                auto prev_var_name = instruction.getPrevNode()->getName();
-                                expr = Node::CreateBinOp(Node::CreateVar(std::string(prev_var_name)),
+                                auto prev_var = instruction.getPrevNode();
+                                expr = Node::CreateBinOp(Node::CreateVar(prev_var),
                                                          Node::CreateConst(std::string("1234567")),
                                                          std::string("<"));;
                                 //_init_var < magic number
@@ -127,7 +127,7 @@ namespace {
                             switch (opcode) {
                                 // Terminator instructions
                                 case Instruction::Ret: {//TODO: handle same varibale names in different scopes
-                                    tmp_expr = Node::CreateVar("_ret_");
+                                    tmp_expr = Node::CreateVar(&instruction);
                                     auto retins = cast<ReturnInst>(&instruction);
                                     handleRet(*retins, expr);
                                     break;
@@ -228,8 +228,8 @@ namespace {
                                 case Instruction::FPExt:
                                 case Instruction::ZExt:
                                 case Instruction::SExt: {
-                                    Node::substitute(expr, instruction.getName(),
-                                                     Node::CreateVar(instruction.getOperand(0)->getName()));
+                                    Node::substitute(expr, &instruction,
+                                                     Node::CreateVar(instruction.getOperand(0)));
                                     //TODO: should we add the semantics of floating point numbers into constraints?
                                     break;
                                 }
@@ -286,10 +286,10 @@ namespace {
                                             auto arg_val = HandleConstOrVar(*q);
                                             outs() << "substitute call sites: " << p->getName() << " "
                                                    << arg_val->ToString() << "\n";
-                                            Node::substitute(udexpr, p->getName(), arg_val);
+                                            Node::substitute(udexpr, p, arg_val);
                                         }
                                         outs() << "substituted udexpr:" << udexpr->ToString() << "\n";
-                                        Node::fillUndeterminedPredicate(udexpr, expr, lhs);
+                                        Node::fillUndeterminedPredicate(udexpr, expr, &instruction);
                                         expr = udexpr;
                                     }
                                     //TODO: define a var called __ret_val__ for substitution

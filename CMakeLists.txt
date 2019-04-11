@@ -5,6 +5,7 @@ find_package(LLVM REQUIRED CONFIG)
 set(CMAKE_CXX_STANDARD 14)
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
+
 link_directories(${LLVM_LIBRARY_DIRS})
 
 add_library(static_wp_lava SHARED src/MainPass.cpp src/MainPass.h src/WpExpr.cpp src/WpExpr.h src/InsHandler.cpp src/InsHandler.h src/Miscs.cpp src/Miscs.h)
@@ -13,4 +14,8 @@ set_target_properties(static_wp_lava PROPERTIES
         COMPILE_FLAGS "-fno-rtti"
         )
 
-add_executable(test_expr src/WpExpr.h src/WpExpr.cpp src/test_expr.cpp)
+#add_executable(test_expr src/WpExpr.h src/WpExpr.cpp src/test_expr.cpp)
+
+#set_target_properties(test_expr PROPERTIES
+#        COMPILE_FLAGS "-fno-rtti"
+#        )
