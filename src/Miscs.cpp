@@ -6,11 +6,28 @@
 
 
 //copied from higher version llvm
-StringRef getPredicateName(CmpInst::Predicate Pred) {
+
+WpExpr::Operator predicate2WpExprOp(CmpInst::Predicate Pred) {//https://llvm.org/doxygen/classllvm_1_1CmpInst.html#a283f9a5d4d843d20c40bb4d3e364bb05
+    //unordered sort contains NA
     switch (Pred) {
-        default:
-            return "unknown";
+        case ICmpInst::ICMP_EQ:
+            return WpExpr::EQ;
+        case ICmpInst::ICMP_SGT:case ICmpInst::ICMP_UGT:
+            return WpExpr::GT;
+        case ICmpInst::ICMP_SGE:case ICmpInst::ICMP_UGE:
+            return WpExpr::GE;
+        case ICmpInst::ICMP_SLT:case ICmpInst::ICMP_ULT:
+            return WpExpr::LT;
+        case ICmpInst::ICMP_SLE:case ICmpInst::ICMP_ULE:
+            return WpExpr::LE;
+        case ICmpInst::ICMP_NE:
+            return WpExpr::NEQ;
+        case FCmpInst::FCMP_TRUE:
         case FCmpInst::FCMP_FALSE:
+        default:
+            assert(false);
+/*
+            return "unknown";
             return "false";
         case FCmpInst::FCMP_OEQ:
             return "oeq";
@@ -40,28 +57,7 @@ StringRef getPredicateName(CmpInst::Predicate Pred) {
             return "ule";
         case FCmpInst::FCMP_UNE:
             return "une";
-        case FCmpInst::FCMP_TRUE:
-            return "true";
-        case ICmpInst::ICMP_EQ:
-            return "=";
-        case ICmpInst::ICMP_NE:
-            return "ne";
-        case ICmpInst::ICMP_SGT:
-            return "sgt";
-        case ICmpInst::ICMP_SGE:
-            return "sge";
-        case ICmpInst::ICMP_SLT:
-            return "slt";
-        case ICmpInst::ICMP_SLE:
-            return "sle";
-        case ICmpInst::ICMP_UGT:
-            return ">";
-        case ICmpInst::ICMP_UGE:
-            return "uge";
-        case ICmpInst::ICMP_ULT:
-            return "<";
-        case ICmpInst::ICMP_ULE:
-            return "ule";
+            return "true";*/
     }
 }
 
@@ -84,5 +80,27 @@ const char *opcode2Name(unsigned opcode) {
             return "mod";
         default:
             return Instruction::getOpcodeName(opcode);
+    }
+}
+
+const WpExpr::Operator opcode2WpExprOp(unsigned opcode) {
+    switch (opcode) {
+        case Instruction::FAdd:
+        case Instruction::Add:
+            return WpExpr::PLUS;
+        case Instruction::Sub:
+            return WpExpr::MINUS;
+        case Instruction::FMul:
+        case Instruction::Mul:
+            return WpExpr::MUL;
+        case Instruction::UDiv:
+        case Instruction::SDiv:
+            return WpExpr::DIV;
+        case Instruction::URem:
+        case Instruction::SRem:
+            return WpExpr::MOD;
+        default:
+            std::cout << "Unrecognized opcode: " << opcode << "\n";
+            //return Instruction::getOpcodeName(opcode);
     }
 }

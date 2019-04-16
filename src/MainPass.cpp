@@ -27,6 +27,8 @@
 #include <iostream>
 //#include <z3++.h>
 #include <unordered_map>
+#include "MyZ3Helper.h"
+
 
 using namespace llvm;
 using namespace WpExpr;
@@ -117,7 +119,7 @@ namespace {
                                 auto prev_var = instruction.getPrevNode();
                                 expr = Node::CreateBinOp(Node::CreateVar(prev_var),
                                                          Node::CreateConst(std::string("1234567")),
-                                                         std::string("<"));;
+                                                         WpExpr::LT);
                                 //_init_var < magic number
                             }
                         } else if (this->InWP) {
@@ -183,7 +185,8 @@ namespace {
                                 }
 //todo: bitwise operations
                                 case Instruction::And:
-                                case Instruction::Or: {
+                                case Instruction::Or:
+                                case Instruction::Xor:{
                                     auto bitwiseinst = cast<BinaryOperator>(&instruction);
                                     auto width = bitwiseinst->getType()->getIntegerBitWidth();
                                     if (width == 1) {
@@ -265,6 +268,16 @@ namespace {
                                         outs() << "_wp_begin\n";
                                         this->InWP = false;
                                         outs() << expr->ToSMTLanguage() << "\n";
+                                        SolverContext sc;
+                                        auto z3expr = sc.WpExprToZ3Expr(expr);
+                                        std::cout<<"z3expr:\n";
+                                        std::cout<<z3expr<<"\n";
+                                        std::cout<<"---------\n";
+                                        tactic t1(sc.Context, "ctx-solver-simplify");
+                                        goal g(sc.Context);
+                                        g.add(z3expr);
+                                        auto simplifyResult = t1(g);
+                                        std::cout<<simplifyResult<<"\n";
                                         continue;
                                         //TODO: solve the WP with z3
                                     }

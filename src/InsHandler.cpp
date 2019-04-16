@@ -69,7 +69,7 @@ void handleGetElementPtr(GetElementPtrInst &inst, Node::NodePtr &expr) {
         value = Node::CreateBinOp(
                 Node::CreateVar(std::string("lava_val")),
                 Node::CreateVar(inst.getOperand(2)->getName()),
-                "[]"
+                WpExpr::Operator::IND
         );
     }else{
         value = Node::CreateVar("_");
@@ -114,7 +114,7 @@ void handleBranch(BranchInst &inst, Node::NodePtr &expr) {
         outs()<<inst.getSuccessor(0)->getName()<<"\n";
         outs()<<inst.getSuccessor(1)->getName()<<"\n";
         Node::substitute(expr, inst.getSuccessor(0), Node::CreateVar(cond));
-        Node::substitute(expr, inst.getSuccessor(1), Node::CreateUniOp(Node::CreateVar(cond), "not"));
+        Node::substitute(expr, inst.getSuccessor(1), Node::CreateUniOp(Node::CreateVar(cond), WpExpr::NOT));
     }else { //unconditional. TODO: replace dest name with basic block's name
 
     }
@@ -131,15 +131,15 @@ void handleSelect(SelectInst &inst, Node::NodePtr &expr) {
     Node::substitute(new_wp_right, &inst, aug2);//WP -> WP[aug2/lhs]
     new_wp_left = Node::CreateBinOp(Node::CreateVar(cond),
                                     std::move(new_wp_left),
-                                    std::string(strAnd));
+                                    WpExpr::AND);
     new_wp_right = Node::CreateBinOp(Node::CreateUniOp(
             Node::CreateVar(cond),
-            std::string(strNot)),
+            WpExpr::NOT),
                                      std::move(new_wp_right),
-                                     std::string(strAnd));
+                                     WpExpr::AND);
     auto new_wp = Node::CreateBinOp(std::move(new_wp_left),
                                     std::move(new_wp_right),
-                                    std::string(strOr));
+                                    WpExpr::OR);
     expr = std::move(new_wp);
 }
 
@@ -147,19 +147,26 @@ void handleSelect(SelectInst &inst, Node::NodePtr &expr) {
 void handleBinaryOperator(BinaryOperator &inst, Node::NodePtr &expr) {
     auto aug0 = HandleConstOrVar(inst.getOperand(0));
     auto aug1 = HandleConstOrVar(inst.getOperand(1));
-    auto op = std::string(opcode2Name(inst.getOpcode()));
+    auto op = opcode2WpExprOp(inst.getOpcode());//std::string((inst.getOpcode()));
     Node::substitute(expr, &inst,
                      Node::CreateBinOp(std::move(aug0), std::move(aug1),
-                                       std::move(op)));
+                                       op));
 }
 
 
 void handleICmp(ICmpInst &inst, Node::NodePtr &expr) {
-    auto aug0 = HandleConstOrVar(inst.getOperand(0));
-    auto aug1 = HandleConstOrVar(inst.getOperand(1));
-    auto predicate = getPredicateName(inst.getUnsignedPredicate());
-    auto cond = Node::CreateBinOp(std::move(aug0), std::move(aug1),
-                                  std::string(predicate));
+    auto llvmpred = inst.getUnsignedPredicate();
+    Node::NodePtr cond;
+    if (llvmpred == FCmpInst::FCMP_FALSE) {
+        cond = Node::CreateConst("false");
+    } else if (llvmpred == FCmpInst::FCMP_TRUE) {
+        cond = Node::CreateConst("true");
+    } else {
+        auto aug0 = HandleConstOrVar(inst.getOperand(0));
+        auto aug1 = HandleConstOrVar(inst.getOperand(1));
+        auto predicate = predicate2WpExprOp(llvmpred);
+        cond = Node::CreateBinOp(std::move(aug0), std::move(aug1), predicate);
+    }
     Node::substitute(expr, &inst, cond);
 }
 
@@ -177,7 +184,7 @@ void handlePHI(PHINode &inst, Node::NodePtr &expr) {
         Node::substitute(new_wp, &inst, aug1);// WP-> WP[aug1/lhs]
         new_wp = Node::CreateBinOp(Node::CreateVar(cond1),
                                    std::move(new_wp),
-                                   std::string(strAnd));
+                                   WpExpr::AND);
         for (unsigned i = 1; i < cnt; ++i) {//TODO: design cases to cover different cnt
             auto cond = inst.getIncomingBlock(i);
             auto aug = HandleConstOrVar(inst.getOperand(1));
@@ -185,10 +192,10 @@ void handlePHI(PHINode &inst, Node::NodePtr &expr) {
             Node::substitute(new_wp_right, &inst, aug);
             new_wp_right = Node::CreateBinOp(Node::CreateVar(cond),
                                              std::move(new_wp_right),
-                                             std::string(strAnd));
+                                             WpExpr::AND);
             new_wp = Node::CreateBinOp(std::move(new_wp),
                                        std::move(new_wp_right),
-                                       std::string(strOr));
+                                       WpExpr::OR);
         }
         expr = std::move(new_wp);
         outs() <<"end of handlPHI\n";
@@ -198,14 +205,14 @@ void handlePHI(PHINode &inst, Node::NodePtr &expr) {
 
 void handleCast(CastInst &inst, Node::NodePtr &expr) {
     auto lhs = inst.getName();
-    switch (inst.getOpcode()){
+    switch (inst.getOpcode()) {
         case Instruction::FPToUI:
-        case Instruction::FPToSI:{
+        case Instruction::FPToSI: {
             auto aug = HandleConstOrVar(inst.getOperand(0));
             auto op = std::string("to_int");
             Node::substitute(expr, &inst,
                              Node::CreateUniOp(std::move(aug),
-                                               std::move(op)));
+                                               WpExpr::TO_INT));
             break;
         }
         case Instruction::UIToFP:
@@ -214,10 +221,9 @@ void handleCast(CastInst &inst, Node::NodePtr &expr) {
             auto op = std::string("to_real");
             Node::substitute(expr, &inst,
                              Node::CreateUniOp(std::move(aug),
-                                               std::move(op)));
+                                               WpExpr::TO_REAL));
             break;
         }
-
     }
 }
 
@@ -225,14 +231,14 @@ void handleCast(CastInst &inst, Node::NodePtr &expr) {
 void handleLogicOp(BinaryOperator &inst, Node::NodePtr &expr) {
     auto aug0 = HandleConstOrVar(inst.getOperand(0));
     auto aug1 = HandleConstOrVar(inst.getOperand(1));
-    const char * op;
+    WpExpr::Operator op;
     switch (inst.getOpcode())
     {
-        case Instruction::And:op = "and";
+        case Instruction::And:op = WpExpr::AND;
             break;
-        case Instruction::Or:op = "or";
+        case Instruction::Or:op = WpExpr::OR;
             break;
-        case Instruction::Xor:op = "xor";
+        case Instruction::Xor:op = WpExpr::XOR;
             break;
         default:
             assert(false);
@@ -248,9 +254,9 @@ void handleLogicOp(BinaryOperator &inst, Node::NodePtr &expr) {
 void handleFCmp(FCmpInst &inst, Node::NodePtr &expr) {
     auto aug0 = HandleConstOrVar(inst.getOperand(0));
     auto aug1 = HandleConstOrVar(inst.getOperand(1));
-    auto predicate = getPredicateName(inst.getPredicate());
+    auto predicate = predicate2WpExprOp(inst.getPredicate());
     auto cond = Node::CreateBinOp(std::move(aug0), std::move(aug1),
-                                  std::string(predicate));
+                                  predicate);
     auto lhs = inst.getName();
     Node::substitute(expr, &inst, cond);
 }

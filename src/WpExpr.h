@@ -8,6 +8,7 @@
 #include <memory>
 #include "llvm/IR/Value.h"
 #include "llvm/Support/raw_ostream.h"
+#include "z3++.h"
 
 namespace WpExpr{
     enum NodeType {
@@ -17,13 +18,17 @@ namespace WpExpr{
         CONST,        //Constant
         UPRED         //Undetermined predicate of a variable
     };
-    enum Optr {PLUS, MINUS, AND, OR, NOT, MUL, DIV};
+    enum Operator {PLUS, MINUS, AND, OR, MUL, DIV, IND, MOD, XOR,//binop
+            TO_INT, TO_REAL, NOT, //Uniop
+            GT, GE, EQ, NEQ, LT, LE //Compare
+    };
 
     static const char *wp_init_var = "__wp_init_var";
 
     class Node : public std::enable_shared_from_this<Node> {
     public:
         NodeType type;
+        Operator operatorType;
         typedef std::shared_ptr<Node> NodePtr;
         NodePtr left, right;
         llvm::Value *valueObj;
@@ -32,108 +37,29 @@ namespace WpExpr{
 
         Node() : name(value),valueObj(nullptr) {}
 
-        Node(Node &node) : Node() {
-            this->type = node.type;
-            if (node.left != nullptr) {
-                this->left = std::make_shared<Node>(*node.left);
-            } else {
-                this->left = nullptr;
-            }
-            if (node.right != nullptr) {
-                this->right = std::make_shared<Node>(*node.right);
-            } else {
-                this->right = nullptr;
-            }
-            this->value = node.value;
-            this->valueObj = node.valueObj;
-        }
+        Node(Node &node);
 
         Node(NodeType type, NodePtr &&left, NodePtr &&right, std::string &&val) :
                 type(type), left(std::move(left)), right(std::move(right)), value(std::move(val)), name(value) {
 
         }
 
-        std::string ToString() {
-            std::string ret;
-            switch (this->type) {
-                case UNIOP:
-                    ret = "(" + this->value + " " + this->left->ToString() + ")";
-                    break;
-                case BINOP:
-                    ret = "(" + this->left->ToString() + " " + this->value + " " + this->right->ToString() + ")";
-                    break;
-                case CONST:
-                    return this->name;
-                case VAR: {
-                    if (this->valueObj) {
-                        //std::string tmp_name = ;
-                        return this->valueObj->getName();
-                    }else {
-                        return this->value;
-                    }
-                }
-                case UPRED:
-                    return "UPred(" + this->left->ToString() + ")";
-            }
-            return ret;
-        }
+        std::string GetName();
+        std::string ToString();
 
-        std::string ToSMTLanguage() {
-            std::string ret;
-            switch (this->type) {
-                case UNIOP:
-                    ret = "(" + this->value + " " + this->left->ToSMTLanguage() + ")";
-                    break;
-                case BINOP:
-                    ret = "( " + this->value + " " + this->left->ToSMTLanguage() + " " + this->right->ToSMTLanguage() +
-                          ")";
-                    break;
-                case CONST:
-                case VAR:
-                    return this->ToString();
-                case UPRED:
-                    return "UPred("+ this->left->ToSMTLanguage() + ")";
-            }
-            return ret;
-        }
+        std::string ToSMTLanguage();
 
-        static NodePtr CreateBinOp(NodePtr &&left, NodePtr &&right, std::string &&value) {
-            auto ret = std::make_shared<Node>(BINOP, std::move(left), std::move(right), std::move(value));
-            return ret;
-        }
+        static NodePtr CreateBinOp(NodePtr &&left, NodePtr &&right, Operator optr);
 
-        static NodePtr CreateUniOp(NodePtr &&left, std::string &&value) {
-            auto ret = std::make_shared<Node>(UNIOP, std::move(left), NodePtr(),
-                                              std::move(value));
-            return ret;
-        }
+        static NodePtr CreateUniOp(NodePtr &&left, Operator optr);
 
-        static NodePtr CreateVar(llvm::Value *val) {
-            auto name = val->getName();
-            auto ret = std::make_shared<Node>(VAR, NodePtr(),
-                                              NodePtr(), name);
-            ret->valueObj = val;
-            return ret;
-        }
+        static NodePtr CreateVar(llvm::Value *val);
 
-        static NodePtr CreateVar(std::string name) {
-            auto ret = std::make_shared<Node>(VAR, NodePtr(),
-                                              NodePtr(), std::move(name));
-            ret->valueObj = nullptr;
-            return ret;
-        }
+        static NodePtr CreateVar(std::string name);
 
-        static NodePtr CreateConst(std::string value) {
-            return std::make_shared<Node>(CONST, NodePtr(),
-                                          NodePtr(), std::move(value));
-        }
+        static NodePtr CreateConst(std::string value);
 
-        static NodePtr CreateUndeterminedPredicate(llvm::Value *val) {
-            auto varnode = CreateVar(val);
-            auto upred =  std::make_shared<Node>(UPRED, std::move(varnode),
-                                                 NodePtr(), std::move(std::string("")));
-            return upred;
-        }
+        static NodePtr CreateUndeterminedPredicate(llvm::Value *val);
 
         /**
          * This function fills the undetermined predicates generated by a function call.
@@ -142,63 +68,15 @@ namespace WpExpr{
          * @param retValName The name of the call instrution. It should be in expr.
          * @return Returns the upred.
          */
-        static void fillUndeterminedPredicate(NodePtr &upred, const NodePtr &expr, const llvm::Value *val) {
-            if (!upred)
-            {
-                return;
-            }
-            switch (upred->type) {
-                case VAR:case CONST:
-                    break;
-                case UPRED: {
-                    auto upredexpr = upred->left;
-                    upred = std::make_shared<Node>(*expr);
-                    substitute(upred, val, upredexpr);
-                    break;
-                }
-                case BINOP:
-                    fillUndeterminedPredicate(upred->right, expr, val);
-                    fillUndeterminedPredicate(upred->left, expr, val);
-                    break;
-                case UNIOP:
-                    fillUndeterminedPredicate(upred->left, expr, val);
-                    break;
-            }
-        }
+        static void fillUndeterminedPredicate(NodePtr &upred, const NodePtr &expr, const llvm::Value *val);
 
-        static NodePtr substitute(NodePtr &src, const llvm::Value *val, const NodePtr &expr) {
-            if (!src)
-            {
-                return src;
-            }
-            switch (src->type) {
-                case VAR:
-                    if (src->valueObj == val)//|| src->name == WpExpr::wp_init_var
-                    {
-                        src = expr;
-                    } else {
-                        //TODO: warning nothing substituted
-                    }
-                    break;
-                case CONST:
-                    //TODO: warning nothing substituted
-                    break;
-                case UPRED:
-                case UNIOP:
-                    substitute(src->left, val, expr);
-                    break;
-                case BINOP:
-                    substitute(src->left, val, expr);
-                    substitute(src->right, val, expr);
-                    break;
-            }
-            return src;
-        }
+        static NodePtr substitute(NodePtr &src, const llvm::Value *val, const NodePtr &expr);
 
     private:
 
     };
 
+    static z3::context defaultcontext;
 }
 
 
