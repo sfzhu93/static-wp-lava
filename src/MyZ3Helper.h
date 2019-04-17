@@ -19,7 +19,23 @@ public:
     context Context;
     std::unordered_map<std::string, Z3_ast > Env;
 
-    SolverContext(): Context(), Env() {
+    SolverContext(): Env() {
+        this->Context.set("TIMEOUT", "10");
+        /*config conf;
+        conf.set("timeout","10");
+        context ctx(conf);
+        Z3_context zcon = Context;
+        Z3_mk_context(conf)
+        auto solverParameters = Z3_mk_params(zcon);
+        Z3_params_inc_ref(zcon, solverParameters);
+        auto timeoutParamStrSymbol = Z3_mk_string_symbol(zcon, "timeout");
+        Z3_params_set_uint(zcon, solverParameters, timeoutParamStrSymbol, 10);*/
+//        c.set("TIMEOUT",10);
+
+
+        //this->Context
+//        this->Context.set("TIMEOUT",10);
+
     }
 
     z3::expr WpExprToZ3Expr(const WpExpr::Node::NodePtr &node) {
