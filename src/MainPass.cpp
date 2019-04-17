@@ -274,6 +274,10 @@ namespace {
                                         std::cout<<z3expr<<"\n";
                                         std::cout<<"---------\n";
                                         tactic t1(sc.Context, "ctx-solver-simplify");
+                                        params p(sc.Context);
+                                        unsigned tmp = 1;
+                                        p.set("TIMEOUT",tmp);
+                                        t1 = with(t1, p);
                                         goal g(sc.Context);
                                         g.add(z3expr);
                                         auto simplifyResult = t1(g);

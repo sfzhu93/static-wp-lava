@@ -3,6 +3,7 @@
 //
 
 #include "WpExpr.h"
+#include "Miscs.h"
 /*namespace WpExpr{
     Node::NodePtr BinOp::substitute(std::string &name, Node::NodePtr node) {
         if (dynamic_cast<Var&>(*(this->left))
@@ -34,10 +35,10 @@ std::string WpExpr::Node::ToString() {
     std::string ret;
     switch (this->type) {
         case UNIOP:
-            ret = "(" + std::to_string(static_cast<int>(this->operatorType)) + " " + this->left->ToString() + ")";
+            ret = std::string("(") + WpExprOperator2CStr(this->operatorType) + " " + this->left->ToString() + ")";
             break;
         case BINOP:
-            ret = "(" + this->left->ToString() + " " + std::to_string(static_cast<int>(this->operatorType)) + " " + this->right->ToString() + ")";
+            ret = "(" + this->left->ToString() + " " + WpExprOperator2CStr(this->operatorType) + " " + this->right->ToString() + ")";
             break;
         case CONST:
             return this->name;
@@ -59,10 +60,10 @@ std::string WpExpr::Node::ToSMTLanguage() {
     std::string ret;
     switch (this->type) {
         case UNIOP:
-            ret = "(" + this->value + " " + this->left->ToSMTLanguage() + ")";
+            ret = std::string("(") + WpExprOperator2CStr(this->operatorType) + " " + this->left->ToSMTLanguage() + ")";
             break;
         case BINOP:
-            ret = "( " + this->value + " " + this->left->ToSMTLanguage() + " " + this->right->ToSMTLanguage() +
+            ret = std::string("( ") + WpExprOperator2CStr(this->operatorType) + " " + this->left->ToSMTLanguage() + " " + this->right->ToSMTLanguage() +
                   ")";
             break;
         case CONST:

@@ -16,6 +16,7 @@ StringRef getPredicateName(CmpInst::Predicate Pred);
 const char *opcode2Name(unsigned opcode);
 const WpExpr::Operator opcode2WpExprOp(unsigned opcode);
 WpExpr::Operator predicate2WpExprOp(CmpInst::Predicate Pred);
+const char * WpExprOperator2CStr(WpExpr::Operator op);
 
 
 #endif //STATIC_WP_LAVA_MISCS_H

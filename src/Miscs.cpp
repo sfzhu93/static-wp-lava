@@ -104,3 +104,49 @@ const WpExpr::Operator opcode2WpExprOp(unsigned opcode) {
             //return Instruction::getOpcodeName(opcode);
     }
 }
+
+
+const char *WpExprOperator2CStr(WpExpr::Operator op) {
+    switch (op) {
+        case WpExpr::PLUS:
+            return "+";
+        case WpExpr::MINUS:
+            return "-";
+        case WpExpr::AND:
+            return "and";
+        case WpExpr::OR:
+            return "or";
+        case WpExpr::MUL:
+            return "*";
+        case WpExpr::DIV:
+            return "/";
+        case WpExpr::IND:
+            return "[]";
+        case WpExpr::MOD:
+            return "%";
+        case WpExpr::XOR:
+            return "^";
+        case WpExpr::TO_INT:
+            return "TO_INT";
+        case WpExpr::TO_REAL:
+            return "TO_REAL";
+        case WpExpr::NOT:
+            return "not";
+        case WpExpr::GT:
+            return ">";
+        case WpExpr::GE:
+            return ">=";
+        case WpExpr::EQ:
+            return "=";
+        case WpExpr::NEQ:
+            return "!=";
+        case WpExpr::LT:
+            return "<";
+        case WpExpr::LE:
+            return "<=";
+    }
+    /*    enum Operator {PLUS, MINUS, AND, OR, MUL, DIV, IND, MOD, XOR,//binop
+            TO_INT, TO_REAL, NOT, //Uniop
+            GT, GE, EQ, NEQ, LT, LE //Compare
+    };*/
+}
