@@ -1,0 +1,13 @@
+(goals
+(goal
+  (let ((a!1 (and (not (<= 100 c)) (< c 100) (not (<= 1234567 (+ 11 c a)))))
+        (a!2 (and (<= (+ b a) 0)
+                  (not (> (+ b a) 0))
+                  (not (<= 1234567 (+ b c a)))))
+        (a!4 (and (< c 100) (< (+ (+ b c) a 10) 1234567)))
+        (a!5 (and (not (> (+ b a) 0)) (< (+ (+ b c) a) 1234567))))
+  (let ((a!3 (and (not (<= (* b c) 10)) (or a!1 a!2)))
+        (a!6 (and (not (> (+ b a) 0)) (or a!4 a!5))))
+  (let ((a!7 (and (not (> (* c b) 10)) (or (and (< c 100) (or a!4 a!5)) a!6))))
+    (or a!3 a!7)))))
+)
