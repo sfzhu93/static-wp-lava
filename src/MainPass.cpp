@@ -38,6 +38,7 @@ namespace {
     //ModulePass for interprocedural analysis
     struct MainPass : public ModulePass {
         static char ID;
+        std::string modulename;
         MainPass() : ModulePass(ID) {}
         WpExpr::Node::NodePtr WP;
         bool InWP = false;
@@ -274,14 +275,18 @@ namespace {
                                         std::cout<<z3expr<<"\n";
                                         std::cout<<"---------\n";
                                         tactic t1(sc.Context, "ctx-solver-simplify");
-                                        params p(sc.Context);
+                                        t1 = try_for(t1, 100);
+                                        /*params p(sc.Context);
                                         unsigned tmp = 1;
-                                        p.set("TIMEOUT",tmp);
-                                        t1 = with(t1, p);
+                                        p.set("timeout",tmp);
+                                        t1 = with(t1, p);*/
                                         goal g(sc.Context);
                                         g.add(z3expr);
                                         auto simplifyResult = t1(g);
                                         std::cout<<simplifyResult<<"\n";
+                                        std::ofstream fout(this->modulename+".z3result");
+                                        fout<<simplifyResult<<"\n";
+                                        fout.close();
                                         continue;
                                         //TODO: solve the WP with z3
                                     }
@@ -366,7 +371,8 @@ namespace {
 
         bool runOnModule(Module &M) override {
             std::cout<<"init\n";
-            this->wpPrinter.open(std::string(M.getName())+std::string("_wp.md"));
+            this->modulename = std::string(M.getName());
+            this->wpPrinter.open(this->modulename+std::string("_wp.md"));
             for (Function &F : M) {
                 auto ret = this->handleFunctionCall(F);
                 if (ret){
