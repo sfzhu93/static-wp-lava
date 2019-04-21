@@ -288,7 +288,6 @@ namespace {
                                         fout<<simplifyResult<<"\n";
                                         fout.close();
                                         continue;
-                                        //TODO: solve the WP with z3
                                     }
                                     outs() << "#arg: " << func->arg_size() << "\n";
                                     outs() << "call site args: ";
@@ -314,7 +313,6 @@ namespace {
                                         Node::fillUndeterminedPredicate(udexpr, expr, &instruction);
                                         expr = udexpr;
                                     }
-                                    //TODO: define a var called __ret_val__ for substitution
                                     break;
                                 }
                                 case Instruction::Select: {//from WP to (cond and WP[aug1/lhs] or not cond and WP[aug2/lhs])
