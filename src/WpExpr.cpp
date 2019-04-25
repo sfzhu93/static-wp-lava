@@ -14,6 +14,9 @@
 
 }
 */
+
+using namespace WpExpr;
+
 WpExpr::Node::Node(WpExpr::Node &node) : Node() {
     this->type = node.type;
     if (node.left != nullptr) {
@@ -75,20 +78,21 @@ std::string WpExpr::Node::ToSMTLanguage() {
     return ret;
 }
 
-WpExpr::Node::NodePtr
-WpExpr::Node::CreateBinOp(WpExpr::Node::NodePtr &&left, WpExpr::Node::NodePtr &&right, WpExpr::Operator optr) {
+NodePtr
+WpExpr::Node::CreateBinOp(NodePtr &&left, NodePtr &&right, WpExpr::Operator optr) {
+    
     auto ret = std::make_shared<Node>(BINOP, std::move(left), std::move(right), "");
     ret->operatorType = optr;
     return ret;
 }
 
-WpExpr::Node::NodePtr WpExpr::Node::CreateUniOp(WpExpr::Node::NodePtr &&left, WpExpr::Operator optr) {
+NodePtr WpExpr::Node::CreateUniOp(NodePtr &&left, WpExpr::Operator optr) {
     auto ret = std::make_shared<Node>(UNIOP, std::move(left), NodePtr(), "");
     ret->operatorType = optr;
     return ret;
 }
 
-WpExpr::Node::NodePtr WpExpr::Node::CreateVar(llvm::Value *val) {
+NodePtr WpExpr::Node::CreateVar(llvm::Value *val) {
     auto name = val->getName();
     auto ret = std::make_shared<Node>(VAR, NodePtr(),
                                       NodePtr(), name);
@@ -96,26 +100,26 @@ WpExpr::Node::NodePtr WpExpr::Node::CreateVar(llvm::Value *val) {
     return ret;
 }
 
-WpExpr::Node::NodePtr WpExpr::Node::CreateVar(std::string name) {
+NodePtr WpExpr::Node::CreateVar(std::string name) {
     auto ret = std::make_shared<Node>(VAR, NodePtr(),
                                       NodePtr(), std::move(name));
     ret->valueObj = nullptr;
     return ret;
 }
 
-WpExpr::Node::NodePtr WpExpr::Node::CreateConst(std::string value) {
+NodePtr WpExpr::Node::CreateConst(std::string value) {
     return std::make_shared<Node>(CONST, NodePtr(),
                                   NodePtr(), std::move(value));
 }
 
-WpExpr::Node::NodePtr WpExpr::Node::CreateUndeterminedPredicate(llvm::Value *val) {
+NodePtr WpExpr::Node::CreateUndeterminedPredicate(llvm::Value *val) {
     auto varnode = CreateVar(val);
     auto upred =  std::make_shared<Node>(UPRED, std::move(varnode),
                                          NodePtr(), std::move(std::string("")));
     return upred;
 }
 
-void WpExpr::Node::fillUndeterminedPredicate(WpExpr::Node::NodePtr &upred, const WpExpr::Node::NodePtr &expr,
+void WpExpr::Node::fillUndeterminedPredicate(NodePtr &upred, const NodePtr &expr,
                                              const llvm::Value *val) {
     if (!upred)
     {
@@ -140,8 +144,8 @@ void WpExpr::Node::fillUndeterminedPredicate(WpExpr::Node::NodePtr &upred, const
     }
 }
 
-WpExpr::Node::NodePtr
-WpExpr::Node::substitute(WpExpr::Node::NodePtr &src, const llvm::Value *val, const WpExpr::Node::NodePtr &expr) {
+NodePtr
+WpExpr::Node::substitute(NodePtr &src, const llvm::Value *val, const NodePtr &expr) {
     if (!src)
     {
         return src;
@@ -170,6 +174,18 @@ WpExpr::Node::substitute(WpExpr::Node::NodePtr &src, const llvm::Value *val, con
     return src;
 }
 
+std::list<NodePtr> &
+WpExpr::Node::substitute(std::list<NodePtr> &src, const llvm::Value *val, const NodePtr &expr) {
+    if (src.empty())
+    {
+        return src;
+    }
+    for (auto item:src) {
+        substitute(item, val, expr);
+    }
+    return src;
+}
+
 std::string WpExpr::Node::GetName() {
     if (this->type == VAR) {
         return this->valueObj->getName();
@@ -180,3 +196,30 @@ std::string WpExpr::Node::GetName() {
 
     }*/
 }
+
+void Node::fillUndeterminedPredicate(std::list<std::shared_ptr<Node> > &upred, const std::list<std::shared_ptr<Node>> &expr_list,
+                                     const llvm::Value *val) {
+    std::list<NodePtr> ret;
+    for (auto expr:expr_list) {
+        std::list<NodePtr> tmp;
+        for (auto upred_elem:upred) {
+            tmp.push_back(std::make_shared<Node>(*upred_elem));
+        }
+        fillUndeterminedPredicate(tmp, expr, val);
+        ret.splice(ret.end(), tmp);
+    }
+    upred = ret;
+}
+
+void
+Node::fillUndeterminedPredicate(std::list<std::shared_ptr<Node> > &upred, const std::shared_ptr<Node> &expr,
+        const llvm::Value *val) {
+    if (upred.empty()) {
+        return;
+    }
+    for (auto item:upred) {
+        fillUndeterminedPredicate(item, expr, val);
+    }
+}
+
+

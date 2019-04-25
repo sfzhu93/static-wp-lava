@@ -38,7 +38,7 @@ public:
 
     }
 
-    z3::expr WpExprToZ3Expr(const WpExpr::Node::NodePtr &node) {
+    z3::expr WpExprToZ3Expr(const NodePtr &node) {
         //z3::expr ret = c.int_const("__unused__value__");
         switch (node->type) {
             case WpExpr::UNIOP:

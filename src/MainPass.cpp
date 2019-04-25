@@ -28,7 +28,7 @@
 //#include <z3++.h>
 #include <unordered_map>
 #include "MyZ3Helper.h"
-
+#include <list>
 
 using namespace llvm;
 using namespace WpExpr;
@@ -40,7 +40,8 @@ namespace {
         static char ID;
         std::string modulename;
         MainPass() : ModulePass(ID) {}
-        WpExpr::Node::NodePtr WP;
+        NodePtr WP;
+        std::list<NodePtr> WPConstraintSet;
         bool InWP = false;
         std::unordered_map<std::uintptr_t, int> naming_map;
         std::unordered_map<std::uintptr_t, int> visitedFunc;
@@ -80,23 +81,21 @@ namespace {
             return std::string("_lava_") + std::to_string(bug_no);
         }
 
-        Node::NodePtr handleGEP(GetElementPtrInst &GEPIns)
+        NodePtr handleGEP(GetElementPtrInst &GEPIns)
         {
             //TODO: add SVF support
             outs()<<"in handelGEP:\n";
             this->printOperandNames(GEPIns);
-
         }
 
-        Node::NodePtr handleFunctionCall(Function& function) {
-            Node::NodePtr expr;
+        std::list<NodePtr> handleFunctionCall(Function& function) {
+            NodePtr expr;
+            std::list<NodePtr> constraint_list;
             outs() << "In Function:" << function.getName() << "()\n";
             this->wpPrinter.setFuncName(function.getName());
             if (function.isDeclaration()) {
-                return expr;
+                return std::list<NodePtr>();
             }
-            Node::NodePtr tmp_expr = std::make_shared<Node>();
-
             for (scc_iterator<Function *> BB = scc_begin(&function), BBE = scc_end(&function); BB != BBE; ++BB) {
                 const std::vector<BasicBlock *> &SCCBBs = *BB;
                 for (auto BBI = SCCBBs.begin(); BBI != SCCBBs.end(); ++BBI) {
@@ -121,6 +120,7 @@ namespace {
                                 expr = Node::CreateBinOp(Node::CreateVar(prev_var),
                                                          Node::CreateConst(std::string("1234567")),
                                                          WpExpr::LT);
+                                constraint_list.push_front(expr);
                                 //_init_var < magic number
                             }
                         } else if (this->InWP) {
@@ -130,9 +130,8 @@ namespace {
                             switch (opcode) {
                                 // Terminator instructions
                                 case Instruction::Ret: {//TODO: handle same varibale names in different scopes
-                                    tmp_expr = Node::CreateVar(&instruction);
                                     auto retins = cast<ReturnInst>(&instruction);
-                                    handleRet(*retins, expr);
+                                    handleRet(*retins, constraint_list);
                                     break;
                                 }
 
@@ -140,7 +139,7 @@ namespace {
                                     auto brins = cast<BranchInst>(&instruction);
                                     outs() << "Number of ops: " << brins->getNumOperands() << "\n";
                                     outs() << "Number of succs: " << brins->getNumSuccessors() << "\n";
-                                    handleBranch(*brins, expr);
+                                    handleBranch(*brins, constraint_list);
                                 }
                                     break;
 
@@ -179,7 +178,7 @@ namespace {
                                 case Instruction::SRem:
                                 case Instruction::FRem: {
                                     auto binins = cast<BinaryOperator>(&instruction);
-                                    handleBinaryOperator(*binins, expr);
+                                    handleBinaryOperator(*binins, constraint_list);
 
                                     //outs()<<"Op0 Name: "<<instruction.getOperand(0)->getName()<<"\n";
                                     break;
@@ -191,7 +190,7 @@ namespace {
                                     auto bitwiseinst = cast<BinaryOperator>(&instruction);
                                     auto width = bitwiseinst->getType()->getIntegerBitWidth();
                                     if (width == 1) {
-                                        handleLogicOp(*bitwiseinst, expr);
+                                        handleLogicOp(*bitwiseinst, constraint_list);
                                     }
                                     outs() << "bit width: " << std::to_string(width) << "\n";
                                     break;
@@ -206,14 +205,14 @@ namespace {
                                 }
                                 case Instruction::GetElementPtr: {
                                     auto gepins = cast<GetElementPtrInst>(&instruction);
-                                    handleGetElementPtr(*gepins, expr);
+                                    handleGetElementPtr(*gepins, constraint_list);
                                     break;
                                 }
                                 case Instruction::Load: {
                                     auto loadins = cast<LoadInst>(&instruction);
                                     outs() << "In loadIns: \n";
                                     this->printOperandNames(instruction);
-                                    handleLoad(*loadins, expr);
+                                    handleLoad(*loadins, constraint_list);
                                     break;
                                 }
 
@@ -243,7 +242,7 @@ namespace {
                                 case Instruction::FPToUI:
                                 case Instruction::FPToSI: {
                                     auto castinst = cast<CastInst>(&instruction);
-                                    handleCast(*castinst, expr);
+                                    handleCast(*castinst, constraint_list);
                                     //TODO: generate to_real and to_int
                                     break;
                                 }
@@ -268,25 +267,29 @@ namespace {
                                     if (func->getName() == "_wp_begin") {
                                         outs() << "_wp_begin\n";
                                         this->InWP = false;
-                                        outs() << expr->ToSMTLanguage() << "\n";
-                                        SolverContext sc;
+                                        std::list<NodePtr> eliminated_expr;
+                                        for (auto e:constraint_list) {
+
+                                        }
+                                        //outs() << expr->ToSMTLanguage() << "\n";
+                                        /*SolverContext sc;
                                         auto z3expr = sc.WpExprToZ3Expr(expr);
                                         std::cout<<"z3expr:\n";
                                         std::cout<<z3expr<<"\n";
                                         std::cout<<"---------\n";
                                         tactic t1(sc.Context, "ctx-solver-simplify");
                                         t1 = try_for(t1, 100);
-                                        /*params p(sc.Context);
+                                        params p(sc.Context);
                                         unsigned tmp = 1;
                                         p.set("timeout",tmp);
-                                        t1 = with(t1, p);*/
+                                        t1 = with(t1, p);
                                         goal g(sc.Context);
                                         g.add(z3expr);
                                         auto simplifyResult = t1(g);
                                         std::cout<<simplifyResult<<"\n";
                                         std::ofstream fout(this->modulename+".z3result");
                                         fout<<simplifyResult<<"\n";
-                                        fout.close();
+                                        fout.close();*/
                                         continue;
                                     }
                                     outs() << "#arg: " << func->arg_size() << "\n";
@@ -298,26 +301,26 @@ namespace {
                                     if (func->isDeclaration()) {
                                         continue;
                                     }
-                                    Node::NodePtr udexpr = this->handleFunctionCall(*func);
+                                    std::list<NodePtr> udexpr = this->handleFunctionCall(*func);
                                     this->wpPrinter.setFuncName(function.getName());
-                                    if (udexpr) {
+                                    if (!udexpr.empty()) {
                                         auto p = func->arg_begin();
                                         auto q = callins->op_begin();
                                         for (; p != func->arg_end() && q != callins->op_end(); p++, q++) {
                                             auto arg_val = HandleConstOrVar(*q);
                                             outs() << "substitute call sites: " << p->getName() << " "
                                                    << arg_val->ToString() << "\n";
-                                            Node::substitute(udexpr, p, arg_val);
+                                            Node::substitute(udexpr, &(*p), arg_val);
                                         }
-                                        outs() << "substituted udexpr:" << udexpr->ToString() << "\n";
-                                        Node::fillUndeterminedPredicate(udexpr, expr, &instruction);
-                                        expr = udexpr;
+                                        //outs() << "substituted udexpr:" << udexpr->ToString() << "\n";
+                                        Node::fillUndeterminedPredicate(udexpr, constraint_list, &instruction);
+                                        constraint_list = udexpr;
                                     }
                                     break;
                                 }
                                 case Instruction::Select: {//from WP to (cond and WP[aug1/lhs] or not cond and WP[aug2/lhs])
                                     auto selectins = cast<SelectInst>(&instruction);
-                                    handleSelect(*selectins, expr);
+                                    handleSelect(*selectins, constraint_list);
                                     break;
                                 }
                                     /*case Instruction::And:
@@ -326,25 +329,23 @@ namespace {
                                 case Instruction::ICmp: //WP[(aug0 predicate aug1)/lhs]
                                 {
                                     auto cmpins = cast<ICmpInst>(&instruction);
-                                    handleICmp(*cmpins, expr);
+                                    handleICmp(*cmpins, constraint_list);
                                     break;
                                 }
 
                                 case Instruction::VAArg:
                                 case Instruction::FCmp: {
                                     auto fcmpinst = cast<FCmpInst>(&instruction);
-                                    handleFCmp(*fcmpinst, expr);
+                                    handleFCmp(*fcmpinst, constraint_list);
                                 }
                                 case Instruction::LandingPad: {
                                     outs() << "unimplemented instr\n";
                                     break;
                                 }
-
-
                                 case Instruction::PHI: {
                                     this->printOperandNames(instruction);
                                     auto phiins = cast<PHINode>(&instruction);
-                                    handlePHI(*phiins, expr);
+                                    handlePHI(*phiins, constraint_list);
                                 }
                                     break;
                                 default:
@@ -352,19 +353,23 @@ namespace {
                                     break;
                             }
                             //instruction.dump();
-                            if (expr) {
-                                auto wpstring = expr->ToString();
-                                outs() << "WP: " << wpstring << "\n";
+                            if (!constraint_list.empty()) {
+                                std::string wpstr_infile = "";
+                                for (auto x:constraint_list) {
+                                    auto wpstring = x->ToString();
+                                    outs() << wpstring << " or \n";
+                                    wpstr_infile+=wpstring+" or ";
+                                }
                                 std::string inststr;
                                 llvm::raw_string_ostream rso(inststr);
                                 instruction.print(rso);
-                                this->wpPrinter.emit(inststr, wpstring);
+                                this->wpPrinter.emit(inststr, wpstr_infile);
                             }
                         }
                     }
                 }
             }
-            return expr;
+            return constraint_list;
         }
 
         bool runOnModule(Module &M) override {
@@ -373,8 +378,10 @@ namespace {
             this->wpPrinter.open(this->modulename+std::string("_wp.md"));
             for (Function &F : M) {
                 auto ret = this->handleFunctionCall(F);
-                if (ret){
-                    outs()<<ret->ToString()<<"\n";
+                if (!ret.empty()){
+                    for (auto expr:ret) {
+                        outs() << expr->ToString() << "\n";
+                    }
                 }
             }
             this->wpPrinter.close();

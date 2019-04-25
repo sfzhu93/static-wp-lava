@@ -22,8 +22,8 @@ static const char * strNot = "not";
  * (i.e. the name of the Instruction). Otherwise it returns the literal value
  * of the constant.
  */
-Node::NodePtr HandleConstOrVar(Value *value) {
-    Node::NodePtr ret;
+NodePtr HandleConstOrVar(Value *value) {
+    NodePtr ret;
     if(auto c = dyn_cast<Constant>(value))
     {
         auto type = c->getType()->getTypeID();
@@ -56,15 +56,15 @@ Node::NodePtr HandleConstOrVar(Value *value) {
 /**
  *
  * @param inst The GetElementPtr instruction.
- * @param expr The reference to the smart pointer of expression to be substituted.
+ * @param expr_list The reference to the smart pointer of expression to be substituted.
  */
-void handleGetElementPtr(GetElementPtrInst &inst, Node::NodePtr &expr) {
+void handleGetElementPtr(GetElementPtrInst &inst, std::list<NodePtr> &expr_list) {
     auto a = inst.getOperand(0);
     auto nops = inst.getNumOperands();
     for (int i=0;i<nops;++i){
         outs()<<"GEPOperand: "<<inst.getOperand(i)->getName()<<"\n";
     }
-    Node::NodePtr value;
+    NodePtr value;
     if (isa<GlobalVariable>(a) && a->getName()=="lava_val") {
         value = Node::CreateBinOp(
                 Node::CreateVar(std::string("lava_val")),
@@ -79,98 +79,99 @@ void handleGetElementPtr(GetElementPtrInst &inst, Node::NodePtr &expr) {
         if (auto )
     }*/
 
-    Node::substitute(expr, &inst, value);
+    Node::substitute(expr_list, &inst, value);
 }
 
 /**
  *
  * @param inst The Load instruction.
- * @param expr The reference to the smart pointer of expression to be substituted.
+ * @param expr_list The reference to the smart pointer of expression to be substituted.
  */
-void handleLoad(LoadInst &inst, Node::NodePtr &expr){
-    Node::substitute(expr, &inst, Node::CreateVar(inst.getOperand(0)));
+void handleLoad(LoadInst &inst, std::list<NodePtr> &expr_list){
+    Node::substitute(expr_list, &inst, Node::CreateVar(inst.getOperand(0)));
 
     //TODO: add more notations for the address
 }
 
 
-void handleRet(ReturnInst &inst, Node::NodePtr &expr) {
+void handleRet(ReturnInst &inst, std::list<NodePtr> &expr_list) {
+    assert(expr_list.empty());
+    NodePtr expr;
     if (inst.getReturnValue())
     {
         expr = Node::CreateUndeterminedPredicate(inst.getReturnValue());
+        expr_list.push_front(expr);
         /*Node::substitute(expr,
                          std::string("call"),//TODO: replace __ret_val__
                          Node::CreateVar(inst.getReturnValue()->getName()));*/
 
-    } else
-        expr = Node::NodePtr();
+    } /*else
+        expr = NodePtr();*/
+
 }
 
-void handleBranch(BranchInst &inst, Node::NodePtr &expr) {
+void handleBranch(BranchInst &inst, std::list<NodePtr> &expr_list) {
     auto cnt = inst.getNumSuccessors();
     if (cnt>1)//conditional
     {
         auto cond = inst.getOperand(0);
         outs()<<inst.getSuccessor(0)->getName()<<"\n";
         outs()<<inst.getSuccessor(1)->getName()<<"\n";
-        Node::substitute(expr, inst.getSuccessor(0), Node::CreateVar(cond));
-        Node::substitute(expr, inst.getSuccessor(1), Node::CreateUniOp(Node::CreateVar(cond), WpExpr::NOT));
+        Node::substitute(expr_list, inst.getSuccessor(0), Node::CreateVar(cond));
+        Node::substitute(expr_list, inst.getSuccessor(1), Node::CreateUniOp(Node::CreateVar(cond), WpExpr::NOT));
     }else { //unconditional. TODO: replace dest name with basic block's name
 
     }
 }
 
 
-void handleSelect(SelectInst &inst, Node::NodePtr &expr) {
+void handleSelect(SelectInst &inst, std::list<NodePtr> &expr_list) {
     auto cond = inst.getOperand(0);
     auto aug1 = HandleConstOrVar(inst.getOperand(1));
     auto aug2 = HandleConstOrVar(inst.getOperand(2));
-    auto new_wp_left = std::make_shared<Node>(*expr);
-    auto new_wp_right = std::make_shared<Node>(*expr);
-    Node::substitute(new_wp_left, &inst, aug1);// WP-> WP[aug1/lhs]
-    Node::substitute(new_wp_right, &inst, aug2);//WP -> WP[aug2/lhs]
-    new_wp_left = Node::CreateBinOp(Node::CreateVar(cond),
-                                    std::move(new_wp_left),
-                                    WpExpr::AND);
-    new_wp_right = Node::CreateBinOp(Node::CreateUniOp(
-            Node::CreateVar(cond),
-            WpExpr::NOT),
-                                     std::move(new_wp_right),
-                                     WpExpr::AND);
-    auto new_wp = Node::CreateBinOp(std::move(new_wp_left),
-                                    std::move(new_wp_right),
-                                    WpExpr::OR);
-    expr = std::move(new_wp);
+    std::list<NodePtr> tmp_list;
+    for (auto i = expr_list.begin();i!=expr_list.end();++i){//(auto expr:expr_list) {
+        auto &expr = *i;
+        auto expr_neg = std::make_shared<Node>(*expr);
+        Node::substitute(expr, &inst, aug1);
+        expr = Node::CreateBinOp(Node::CreateVar(cond),
+                std::move(expr),
+                WpExpr::AND);
+        expr_neg = Node::CreateBinOp(Node::CreateUniOp(Node::CreateVar(cond), WpExpr::NOT),
+                std::move(expr_neg),
+                WpExpr::AND);
+        Node::substitute(expr_neg, &inst, aug2);
+        tmp_list.push_back(expr_neg);
+    }
+    expr_list.splice(expr_list.end(), tmp_list);
 }
 
 
-void handleBinaryOperator(BinaryOperator &inst, Node::NodePtr &expr) {
+void handleBinaryOperator(BinaryOperator &inst, std::list<NodePtr> &expr_list) {
     auto aug0 = HandleConstOrVar(inst.getOperand(0));
     auto aug1 = HandleConstOrVar(inst.getOperand(1));
     auto op = opcode2WpExprOp(inst.getOpcode());//std::string((inst.getOpcode()));
-    Node::substitute(expr, &inst,
-                     Node::CreateBinOp(std::move(aug0), std::move(aug1),
-                                       op));
+    Node::substitute(expr_list, &inst, Node::CreateBinOp(std::move(aug0), std::move(aug1), op));
 }
 
 
-void handleICmp(ICmpInst &inst, Node::NodePtr &expr) {
+void handleICmp(ICmpInst &inst, std::list<NodePtr> &expr_list) {
     auto llvmpred = inst.getUnsignedPredicate();
-    Node::NodePtr cond;
-    if (llvmpred == FCmpInst::FCMP_FALSE) {
+    NodePtr cond;
+/*    if (llvmpred == FCmpInst::FCMP_FALSE) {
         cond = Node::CreateConst("false");
     } else if (llvmpred == FCmpInst::FCMP_TRUE) {
         cond = Node::CreateConst("true");
-    } else {
-        auto aug0 = HandleConstOrVar(inst.getOperand(0));
-        auto aug1 = HandleConstOrVar(inst.getOperand(1));
-        auto predicate = predicate2WpExprOp(llvmpred);
-        cond = Node::CreateBinOp(std::move(aug0), std::move(aug1), predicate);
-    }
-    Node::substitute(expr, &inst, cond);
+    } else {*/
+    auto aug0 = HandleConstOrVar(inst.getOperand(0));
+    auto aug1 = HandleConstOrVar(inst.getOperand(1));
+    auto predicate = predicate2WpExprOp(llvmpred);
+    cond = Node::CreateBinOp(std::move(aug0), std::move(aug1), predicate);
+//    }
+    Node::substitute(expr_list, &inst, cond);
 }
 
-void handlePHI(PHINode &inst, Node::NodePtr &expr) {
+void handlePHI(PHINode &inst, std::list<NodePtr> &expr_list) {
     auto lhs = inst.getName();
     auto cnt = inst.getNumIncomingValues();
     if (cnt == 1) {
@@ -179,31 +180,26 @@ void handlePHI(PHINode &inst, Node::NodePtr &expr) {
         //first handling the first two incoming values
         auto cond1 = inst.getIncomingBlock(0);
         auto aug1 = HandleConstOrVar(inst.getOperand(0));
-        auto new_wp = std::make_shared<Node>(*expr);
-        Node::NodePtr new_wp_right = std::make_shared<Node>();
-        Node::substitute(new_wp, &inst, aug1);// WP-> WP[aug1/lhs]
-        new_wp = Node::CreateBinOp(Node::CreateVar(cond1),
-                                   std::move(new_wp),
-                                   WpExpr::AND);
-        for (unsigned i = 1; i < cnt; ++i) {//TODO: design cases to cover different cnt
+        std::list<NodePtr> tmp_list;
+        for (auto i = 0;i<cnt;++i) {
             auto cond = inst.getIncomingBlock(i);
-            auto aug = HandleConstOrVar(inst.getOperand(1));
-            new_wp_right = std::make_shared<Node>(*expr);
-            Node::substitute(new_wp_right, &inst, aug);
-            new_wp_right = Node::CreateBinOp(Node::CreateVar(cond),
-                                             std::move(new_wp_right),
-                                             WpExpr::AND);
-            new_wp = Node::CreateBinOp(std::move(new_wp),
-                                       std::move(new_wp_right),
-                                       WpExpr::OR);
+            auto aug = HandleConstOrVar(inst.getOperand(i));
+            for (auto expr:expr_list) {
+                auto new_wp = std::make_shared<Node>(*expr);
+                Node::substitute(new_wp, &inst, aug);
+                new_wp = Node::CreateBinOp(Node::CreateVar(cond),
+                                           std::move(new_wp),
+                                           WpExpr::AND);
+                tmp_list.push_back(new_wp);
+            }
         }
-        expr = std::move(new_wp);
+        expr_list = tmp_list;
         outs() <<"end of handlPHI\n";
     }
 }
 
 
-void handleCast(CastInst &inst, Node::NodePtr &expr) {
+void handleCast(CastInst &inst, std::list<NodePtr> &expr) {
     auto lhs = inst.getName();
     switch (inst.getOpcode()) {
         case Instruction::FPToUI:
@@ -228,7 +224,7 @@ void handleCast(CastInst &inst, Node::NodePtr &expr) {
 }
 
 
-void handleLogicOp(BinaryOperator &inst, Node::NodePtr &expr) {
+void handleLogicOp(BinaryOperator &inst, std::list<NodePtr> &expr) {
     auto aug0 = HandleConstOrVar(inst.getOperand(0));
     auto aug1 = HandleConstOrVar(inst.getOperand(1));
     WpExpr::Operator op;
@@ -247,11 +243,10 @@ void handleLogicOp(BinaryOperator &inst, Node::NodePtr &expr) {
     Node::substitute(expr, &inst,
                      Node::CreateBinOp(std::move(aug0), std::move(aug1),
                                        op));
-    //TODO: not implemented
 }
 
 
-void handleFCmp(FCmpInst &inst, Node::NodePtr &expr) {
+void handleFCmp(FCmpInst &inst, std::list<NodePtr> &expr) {
     auto aug0 = HandleConstOrVar(inst.getOperand(0));
     auto aug1 = HandleConstOrVar(inst.getOperand(1));
     auto predicate = predicate2WpExprOp(inst.getPredicate());
