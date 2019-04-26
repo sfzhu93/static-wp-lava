@@ -38,6 +38,10 @@ public:
 
     }
 
+    void Reset() {
+        this->Env.clear();
+    }
+
     z3::expr WpExprToZ3Expr(const NodePtr &node) {
         //z3::expr ret = c.int_const("__unused__value__");
         switch (node->type) {
@@ -100,7 +104,8 @@ public:
                     auto con = this->Context.int_const(name.c_str());
                     this->Env[name] = con;
                 }
-                return expr(this->Context, this->Env[name]);
+                auto val = this->Env[name];
+                return expr(this->Context, val);
             }
 
             case WpExpr::UPRED:

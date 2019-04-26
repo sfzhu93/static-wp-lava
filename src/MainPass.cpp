@@ -35,6 +35,12 @@ using namespace WpExpr;
 
 namespace {
 
+    typedef enum FuncVisitState {
+        False,
+        Pure,
+        NotPure
+    };
+
     //ModulePass for interprocedural analysis
     struct MainPass : public ModulePass {
         static char ID;
@@ -44,8 +50,8 @@ namespace {
         std::list<NodePtr> WPConstraintSet;
         bool InWP = false;
         std::unordered_map<std::uintptr_t, int> naming_map;
-        std::unordered_map<std::uintptr_t, int> visitedFunc;
-        std::unordered_map<std::uintptr_t, bool > isPureFunc;
+        std::unordered_map<std::uintptr_t, FuncVisitState > visitedFunc;
+        std::unordered_map<std::uintptr_t, std::list<NodePtr> > PureFuncConstaintSet;
         WpPrinter wpPrinter;
 
         int naming_index = 0;
@@ -89,6 +95,15 @@ namespace {
         }
 
         std::list<NodePtr> handleFunctionCall(Function& function) {
+            bool isPureFunc = true;
+            bool hasCalculatedWP = false;
+            if (this->InWP) {
+                hasCalculatedWP = true;
+            }
+            auto funcAddr = reinterpret_cast<uintptr_t >(&function);
+            if (this->visitedFunc.find(funcAddr)!=this->visitedFunc.end() && this->visitedFunc[funcAddr]==Pure){
+                return this->PureFuncConstaintSet[funcAddr];
+            }
             NodePtr expr;
             std::list<NodePtr> constraint_list;
             outs() << "In Function:" << function.getName() << "()\n";
@@ -116,6 +131,7 @@ namespace {
                             outs() << funcName << "\n";
                             if (funcName == "_wp_end") {
                                 this->InWP = true;
+                                hasCalculatedWP = true;
                                 auto prev_var = instruction.getPrevNode();
                                 expr = Node::CreateBinOp(Node::CreateVar(prev_var),
                                                          Node::CreateConst(std::string("1234567")),
@@ -209,6 +225,7 @@ namespace {
                                     break;
                                 }
                                 case Instruction::Load: {
+                                    isPureFunc = false;
                                     auto loadins = cast<LoadInst>(&instruction);
                                     outs() << "In loadIns: \n";
                                     this->printOperandNames(instruction);
@@ -217,6 +234,7 @@ namespace {
                                 }
 
                                 case Instruction::Store: {
+                                    isPureFunc = false;
                                     outs() << "unimplemented instr\n";
                                     break;
                                 }
@@ -267,10 +285,10 @@ namespace {
                                     if (func->getName() == "_wp_begin") {
                                         outs() << "_wp_begin\n";
                                         this->InWP = false;
-                                        std::list<NodePtr> eliminated_expr;
-                                        for (auto e:constraint_list) {
-
-                                        }
+                                        EliminateUnsatConstraints(constraint_list);
+                                        /*for (auto e:constraint_list) {
+                                            std::cout<<e->ToString()<<"\n";
+                                        }*/
                                         //outs() << expr->ToSMTLanguage() << "\n";
                                         /*SolverContext sc;
                                         auto z3expr = sc.WpExprToZ3Expr(expr);
@@ -302,6 +320,9 @@ namespace {
                                         continue;
                                     }
                                     std::list<NodePtr> udexpr = this->handleFunctionCall(*func);
+                                    if (this->visitedFunc[reinterpret_cast<uintptr_t >(func)]==NotPure) {
+                                        isPureFunc = false;
+                                    }
                                     this->wpPrinter.setFuncName(function.getName());
                                     if (!udexpr.empty()) {
                                         auto p = func->arg_begin();
@@ -369,7 +390,38 @@ namespace {
                     }
                 }
             }
+            EliminateUnsatConstraints(constraint_list);
+            if (hasCalculatedWP) {
+                if (isPureFunc) {
+                    this->visitedFunc[funcAddr] = Pure;
+                    this->PureFuncConstaintSet[funcAddr] = constraint_list;
+                }
+                else
+                    this->visitedFunc[funcAddr] = NotPure;
+            }
             return constraint_list;
+        }
+
+        void EliminateUnsatConstraints(std::list<NodePtr> &constraint_list) const {
+            SolverContext sc;
+            solver s(sc.Context);
+            /*for (auto e:constraint_list) {
+                std::cout<<e->ToString()<<"\n";
+                s.add(sc.WpExprToZ3Expr(e));
+                auto ret = s.check();
+                //sc.Reset();
+                s.reset();
+                std::cout<<(ret==unsat)<<"\n";
+            }*/
+            constraint_list.remove_if([&sc, &s](NodePtr &e) {
+                //std::cout<<e->ToString();
+                s.add(sc.WpExprToZ3Expr(e));
+                auto ret = s.check();
+                s.reset();
+                sc.Reset();
+                //std::cout<<" "<< (ret == unsat) <<"\n";
+                return ret == unsat;
+            });
         }
 
         bool runOnModule(Module &M) override {
