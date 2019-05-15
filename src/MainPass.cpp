@@ -104,6 +104,7 @@ namespace {
             if (this->visitedFunc.find(funcAddr)!=this->visitedFunc.end() && this->visitedFunc[funcAddr]==Pure){
                 return this->PureFuncConstaintSet[funcAddr];
             }
+
             NodePtr expr;
             std::list<NodePtr> constraint_list;
             outs() << "In Function:" << function.getName() << "()\n";
@@ -111,6 +112,24 @@ namespace {
             if (function.isDeclaration()) {
                 return std::list<NodePtr>();
             }
+
+            Instruction *start_ins;
+            BasicBlock *start_block;
+            for (auto& bb:function) {
+                for (auto ins = bb.rbegin(); ins != bb.rend(); ++ins) {
+                    auto opcode = ins->getOpcode();
+                    if (opcode == Instruction::Call) {
+                        auto funcName = ins->getName();
+                        if (funcName == "_wp_end") {
+                            start_ins = &(*ins);
+                            start_block = &bb;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            
             for (scc_iterator<Function *> BB = scc_begin(&function), BBE = scc_end(&function); BB != BBE; ++BB) {
                 const std::vector<BasicBlock *> &SCCBBs = *BB;
                 for (auto BBI = SCCBBs.begin(); BBI != SCCBBs.end(); ++BBI) {
@@ -140,141 +159,8 @@ namespace {
                                 //_init_var < magic number
                             }
                         } else if (this->InWP) {
-                            outs() << "InWP: ";
-                            assert(instruction.getOpcode() == opcode);
-                            //opcode = instruction.getOpcode();
-                            switch (opcode) {
-                                // Terminator instructions
-                                case Instruction::Ret: {//TODO: handle same varibale names in different scopes
-                                    auto retins = cast<ReturnInst>(&instruction);
-                                    handleRet(*retins, constraint_list);
-                                    break;
-                                }
-
-                                case Instruction::Br: {
-                                    auto brins = cast<BranchInst>(&instruction);
-                                    outs() << "Number of ops: " << brins->getNumOperands() << "\n";
-                                    outs() << "Number of succs: " << brins->getNumSuccessors() << "\n";
-                                    handleBranch(*brins, constraint_list);
-                                }
-                                    break;
-
-                                case Instruction::Switch: {//O1 won't generate switch
-                                    outs() << "unimplemented instr\n";
-                                    break;
-                                }
-
-                                case Instruction::IndirectBr: {
-                                    outs() << "unimplemented instr\n";
-                                    break;
-                                }
-
-                                case Instruction::Invoke: {
-                                    outs() << "unimplemented instr\n";
-                                    break;
-                                }
-
-                                case Instruction::Resume: {
-                                    outs() << "unimplemented instr\n";
-                                    break;
-                                }
-                                    // Unary Operations
-
-                                    // Binary Operations
-                                case Instruction::Add:
-                                case Instruction::FAdd:
-                                case Instruction::Sub:
-                                case Instruction::FSub:
-                                case Instruction::Mul:
-                                case Instruction::FMul:
-                                case Instruction::UDiv:
-                                case Instruction::SDiv:
-                                case Instruction::FDiv:
-                                case Instruction::URem:
-                                case Instruction::SRem:
-                                case Instruction::FRem: {
-                                    auto binins = cast<BinaryOperator>(&instruction);
-                                    handleBinaryOperator(*binins, constraint_list);
-
-                                    //outs()<<"Op0 Name: "<<instruction.getOperand(0)->getName()<<"\n";
-                                    break;
-                                }
-//todo: bitwise operations
-                                case Instruction::And:
-                                case Instruction::Or:
-                                case Instruction::Xor:{
-                                    auto bitwiseinst = cast<BinaryOperator>(&instruction);
-                                    auto width = bitwiseinst->getType()->getIntegerBitWidth();
-                                    if (width == 1) {
-                                        handleLogicOp(*bitwiseinst, constraint_list);
-                                    }
-                                    outs() << "bit width: " << std::to_string(width) << "\n";
-                                    break;
-                                }
-
-//TODO: vectors?
-
-                                    // Memory
-                                case Instruction::Alloca: {
-                                    outs() << "unimplemented instr\n";
-                                    break;
-                                }
-                                case Instruction::GetElementPtr: {
-                                    auto gepins = cast<GetElementPtrInst>(&instruction);
-                                    handleGetElementPtr(*gepins, constraint_list);
-                                    break;
-                                }
-                                case Instruction::Load: {
-                                    isPureFunc = false;
-                                    auto loadins = cast<LoadInst>(&instruction);
-                                    outs() << "In loadIns: \n";
-                                    this->printOperandNames(instruction);
-                                    handleLoad(*loadins, constraint_list);
-                                    break;
-                                }
-
-                                case Instruction::Store: {
-                                    isPureFunc = false;
-                                    outs() << "unimplemented instr\n";
-                                    break;
-                                }
-                                case Instruction::Fence: {
-                                    outs() << "unimplemented instr\n";
-                                    break;
-                                }
-
-                                    //conversion
-                                case Instruction::Trunc:
-                                case Instruction::FPTrunc:
-                                case Instruction::FPExt:
-                                case Instruction::ZExt:
-                                case Instruction::SExt: {
-                                    Node::substitute(expr, &instruction,
-                                                     Node::CreateVar(instruction.getOperand(0)));
-                                    //TODO: should we add the semantics of floating point numbers into constraints?
-                                    break;
-                                }
-
-                                case Instruction::UIToFP:
-                                case Instruction::SIToFP:
-                                case Instruction::FPToUI:
-                                case Instruction::FPToSI: {
-                                    auto castinst = cast<CastInst>(&instruction);
-                                    handleCast(*castinst, constraint_list);
-                                    //TODO: generate to_real and to_int
-                                    break;
-                                }
-
-                                case Instruction::PtrToInt:
-                                case Instruction::IntToPtr:
-                                case Instruction::BitCast:
-                                case Instruction::AddrSpaceCast: {
-                                    outs() << "unimplemented instr\n";
-                                    break;
-                                }
-
-                                    //Other
-                                case Instruction::Call: {//TODO: handle variable length args and lazy args
+                            if (opcode == Instruction::Call) {
+                                {//TODO: handle variable length args and lazy args
                                     //TODO: handle same variable names in different scopes
                                     auto callins = cast<CallInst>(&instruction);
                                     auto lhs = callins->getName();
@@ -286,28 +172,6 @@ namespace {
                                         outs() << "_wp_begin\n";
                                         this->InWP = false;
                                         EliminateUnsatConstraints(constraint_list);
-                                        /*for (auto e:constraint_list) {
-                                            std::cout<<e->ToString()<<"\n";
-                                        }*/
-                                        //outs() << expr->ToSMTLanguage() << "\n";
-                                        /*SolverContext sc;
-                                        auto z3expr = sc.WpExprToZ3Expr(expr);
-                                        std::cout<<"z3expr:\n";
-                                        std::cout<<z3expr<<"\n";
-                                        std::cout<<"---------\n";
-                                        tactic t1(sc.Context, "ctx-solver-simplify");
-                                        t1 = try_for(t1, 100);
-                                        params p(sc.Context);
-                                        unsigned tmp = 1;
-                                        p.set("timeout",tmp);
-                                        t1 = with(t1, p);
-                                        goal g(sc.Context);
-                                        g.add(z3expr);
-                                        auto simplifyResult = t1(g);
-                                        std::cout<<simplifyResult<<"\n";
-                                        std::ofstream fout(this->modulename+".z3result");
-                                        fout<<simplifyResult<<"\n";
-                                        fout.close();*/
                                         continue;
                                     }
                                     outs() << "#arg: " << func->arg_size() << "\n";
@@ -337,55 +201,11 @@ namespace {
                                         Node::fillUndeterminedPredicate(udexpr, constraint_list, &instruction);
                                         constraint_list = udexpr;
                                     }
-                                    break;
                                 }
-                                case Instruction::Select: {//from WP to (cond and WP[aug1/lhs] or not cond and WP[aug2/lhs])
-                                    auto selectins = cast<SelectInst>(&instruction);
-                                    handleSelect(*selectins, constraint_list);
-                                    break;
-                                }
-                                    /*case Instruction::And:
-                                    case Instruction::Or:
-                                    case Instruction::Xor:*/
-                                case Instruction::ICmp: //WP[(aug0 predicate aug1)/lhs]
-                                {
-                                    auto cmpins = cast<ICmpInst>(&instruction);
-                                    handleICmp(*cmpins, constraint_list);
-                                    break;
-                                }
-
-                                case Instruction::VAArg:
-                                case Instruction::FCmp: {
-                                    auto fcmpinst = cast<FCmpInst>(&instruction);
-                                    handleFCmp(*fcmpinst, constraint_list);
-                                }
-                                case Instruction::LandingPad: {
-                                    outs() << "unimplemented instr\n";
-                                    break;
-                                }
-                                case Instruction::PHI: {
-                                    this->printOperandNames(instruction);
-                                    auto phiins = cast<PHINode>(&instruction);
-                                    handlePHI(*phiins, constraint_list);
-                                }
-                                    break;
-                                default:
-                                    outs() << "unknown instr\n";
-                                    break;
+                                continue;
                             }
-                            //instruction.dump();
-                            if (!constraint_list.empty()) {
-                                std::string wpstr_infile = "";
-                                for (auto x:constraint_list) {
-                                    auto wpstring = x->ToString();
-                                    outs() << wpstring << " or \n";
-                                    wpstr_infile+=wpstring+" or ";
-                                }
-                                std::string inststr;
-                                llvm::raw_string_ostream rso(inststr);
-                                instruction.print(rso);
-                                this->wpPrinter.emit(inststr, wpstr_infile);
-                            }
+                            handleInstructions(opcode, isPureFunc, expr, constraint_list, instruction);
+                            printConstraints(constraint_list, instruction);
                         }
                     }
                 }
@@ -400,6 +220,191 @@ namespace {
                     this->visitedFunc[funcAddr] = NotPure;
             }
             return constraint_list;
+        }
+
+        void printConstraints(const std::list<NodePtr> &constraint_list, const Instruction &instruction) {
+            if (!constraint_list.empty()) {
+                std::string wpstr_infile = "";
+                for (auto x:constraint_list) {
+                    auto wpstring = x->ToString();
+                    outs() << wpstring << " or \n";
+                    wpstr_infile += wpstring + " or ";
+                }
+                std::string inststr;
+                raw_string_ostream rso(inststr);
+                instruction.print(rso);
+                wpPrinter.emit(inststr, wpstr_infile);
+            }
+        }
+
+        void handleInstructions(unsigned int opcode, bool &isPureFunc, NodePtr &expr, std::list<NodePtr> &constraint_list,
+                                Instruction &instruction) {
+            switch (opcode) {
+                // Terminator instructions
+                case Instruction::Ret: {//TODO: handle same varibale names in different scopes
+                    auto retins = cast<ReturnInst>(&instruction);
+                    handleRet(*retins, constraint_list);
+                    break;
+                }
+
+                case Instruction::Br: {
+                    auto brins = cast<BranchInst>(&instruction);
+                    outs() << "Number of ops: " << brins->getNumOperands() << "\n";
+                    outs() << "Number of succs: " << brins->getNumSuccessors() << "\n";
+                    handleBranch(*brins, constraint_list);
+                }
+                    break;
+
+                case Instruction::Switch: {//O1 won't generate switch
+                    outs() << "unimplemented instr\n";
+                    break;
+                }
+
+                case Instruction::IndirectBr: {
+                    outs() << "unimplemented instr\n";
+                    break;
+                }
+
+                case Instruction::Invoke: {
+                    outs() << "unimplemented instr\n";
+                    break;
+                }
+
+                case Instruction::Resume: {
+                    outs() << "unimplemented instr\n";
+                    break;
+                }
+                    // Unary Operations
+
+                    // Binary Operations
+                case Instruction::Add:
+                case Instruction::FAdd:
+                case Instruction::Sub:
+                case Instruction::FSub:
+                case Instruction::Mul:
+                case Instruction::FMul:
+                case Instruction::UDiv:
+                case Instruction::SDiv:
+                case Instruction::FDiv:
+                case Instruction::URem:
+                case Instruction::SRem:
+                case Instruction::FRem: {
+                    auto binins = cast<BinaryOperator>(&instruction);
+                    handleBinaryOperator(*binins, constraint_list);
+
+                    //outs()<<"Op0 Name: "<<instruction.getOperand(0)->getName()<<"\n";
+                    break;
+                }
+//todo: bitwise operations
+                case Instruction::And:
+                case Instruction::Or:
+                case Instruction::Xor: {
+                    auto bitwiseinst = cast<BinaryOperator>(&instruction);
+                    auto width = bitwiseinst->getType()->getIntegerBitWidth();
+                    if (width == 1) {
+                        handleLogicOp(*bitwiseinst, constraint_list);
+                    }
+                    outs() << "bit width: " << std::to_string(width) << "\n";
+                    break;
+                }
+
+//TODO: vectors?
+
+                    // Memory
+                case Instruction::Alloca: {
+                    outs() << "unimplemented instr\n";
+                    break;
+                }
+                case Instruction::GetElementPtr: {
+                    auto gepins = cast<GetElementPtrInst>(&instruction);
+                    handleGetElementPtr(*gepins, constraint_list);
+                    break;
+                }
+                case Instruction::Load: {
+                    isPureFunc = false;
+                    auto loadins = cast<LoadInst>(&instruction);
+                    outs() << "In loadIns: \n";
+                    printOperandNames(instruction);
+                    handleLoad(*loadins, constraint_list);
+                    break;
+                }
+
+                case Instruction::Store: {
+                    isPureFunc = false;
+                    outs() << "unimplemented instr\n";
+                    break;
+                }
+                case Instruction::Fence: {
+                    outs() << "unimplemented instr\n";
+                    break;
+                }
+
+                    //conversion
+                case Instruction::Trunc:
+                case Instruction::FPTrunc:
+                case Instruction::FPExt:
+                case Instruction::ZExt:
+                case Instruction::SExt: {
+                    Node::substitute(expr, &instruction,
+                                     Node::CreateVar(instruction.getOperand(0)));
+                    //TODO: should we add the semantics of floating point numbers into constraints?
+                    break;
+                }
+
+                case Instruction::UIToFP:
+                case Instruction::SIToFP:
+                case Instruction::FPToUI:
+                case Instruction::FPToSI: {
+                    auto castinst = cast<CastInst>(&instruction);
+                    handleCast(*castinst, constraint_list);
+                    //TODO: generate to_real and to_int
+                    break;
+                }
+
+                case Instruction::PtrToInt:
+                case Instruction::IntToPtr:
+                case Instruction::BitCast:
+                case Instruction::AddrSpaceCast: {
+                    outs() << "unimplemented instr\n";
+                    break;
+                }
+
+                    //Other
+
+                case Instruction::Select: {//from WP to (cond and WP[aug1/lhs] or not cond and WP[aug2/lhs])
+                    auto selectins = cast<SelectInst>(&instruction);
+                    handleSelect(*selectins, constraint_list);
+                    break;
+                }
+                    /*case Instruction::And:
+                    case Instruction::Or:
+                    case Instruction::Xor:*/
+                case Instruction::ICmp: //WP[(aug0 predicate aug1)/lhs]
+                {
+                    auto cmpins = cast<ICmpInst>(&instruction);
+                    handleICmp(*cmpins, constraint_list);
+                    break;
+                }
+
+                case Instruction::VAArg:
+                case Instruction::FCmp: {
+                    auto fcmpinst = cast<FCmpInst>(&instruction);
+                    handleFCmp(*fcmpinst, constraint_list);
+                }
+                case Instruction::LandingPad: {
+                    outs() << "unimplemented instr\n";
+                    break;
+                }
+                case Instruction::PHI: {
+                    printOperandNames(instruction);
+                    auto phiins = cast<PHINode>(&instruction);
+                    handlePHI(*phiins, constraint_list);
+                }
+                    break;
+                default:
+                    outs() << "unknown instr\n";
+                    break;
+            }
         }
 
         void EliminateUnsatConstraints(std::list<NodePtr> &constraint_list) const {
