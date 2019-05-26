@@ -97,7 +97,44 @@ namespace {
             this->printOperandNames(GEPIns);
         }
 
+        Instruction* findWpEnd(Function& function) {
+            Instruction* ret = nullptr;
+            for (auto& bb:function) {
+                for (auto ins = bb.rbegin(); ins != bb.rend(); ++ins) {
+                    auto opcode = ins->getOpcode();
+                    if (opcode == Instruction::Call) {
+                        auto *callInst = dyn_cast<CallInst>(&*ins);
+                        auto func = callInst->getCalledFunction();
+                        auto funcName = func->getName();
+                        outs()<<funcName<<"\n";
+                        if (funcName == "_wp_end") {
+                            ret = &(*ins);
+                            break;
+                        }
+                    }
+                }
+            }
+            return ret;
+        }
+
+
+        void newHandleFunctionCall(Function& function) {
+
+            for (scc_iterator<Function *> BB = scc_begin(&function), BBE = scc_end(&function); BB != BBE; ++BB) {
+
+            }
+        }
+
         std::list<NodePtr> handleFunctionCall(Function& function) {
+            for (scc_iterator<Function *> BB = scc_begin(&function), BBE = scc_end(&function); BB != BBE; ++BB) {
+                const std::vector<BasicBlock *> &SCCBBs = *BB;
+                outs() << SCCBBs.size()<<"\n";
+                for (auto BBI = SCCBBs.begin(); BBI != SCCBBs.end(); ++BBI) {
+                    outs() << "In BB:" << (*BBI)->getName() << "\n";
+                    this->wpPrinter.setBlockName((*BBI)->getName());
+                }
+            }
+
             bool isPureFunc = true;
             bool hasCalculatedWP = false;
             if (this->InWP) {
@@ -161,6 +198,10 @@ namespace {
                     printConstraints(li, *i);
                 }
                 auto bb = start_ins->getParent();
+                for (auto it = pred_begin(bb), et = pred_end(bb); it != et; ++it) {
+                    outs() << "pred bbs: " << (*it)->getName()<<"\n";
+                }
+
             }
 
             EliminateUnsatConstraints(constraint_list);
