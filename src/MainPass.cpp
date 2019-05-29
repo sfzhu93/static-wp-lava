@@ -52,6 +52,7 @@ namespace {
         NodePtr WP;
         std::list<NodePtr> WPConstraintSet;
         bool InWP = false;
+
         std::unordered_map<std::uintptr_t, int> naming_map;
         std::unordered_map<std::uintptr_t, FuncVisitState > visitedFunc;
         std::unordered_map<std::uintptr_t, std::list<NodePtr> > PureFuncConstaintSet;
@@ -106,7 +107,6 @@ namespace {
                         auto *callInst = dyn_cast<CallInst>(&*ins);
                         auto func = callInst->getCalledFunction();
                         auto funcName = func->getName();
-                        outs()<<funcName<<"\n";
                         if (funcName == "_wp_end") {
                             ret = &(*ins);
                             break;
@@ -117,12 +117,61 @@ namespace {
             return ret;
         }
 
+        NodePtr setWp(Instruction *ins) {
+            auto prev_var = ins->getPrevNode();
+            return Node::CreateBinOp(Node::CreateVar(prev_var),
+                                     Node::CreateConst(std::string("1234567")),
+                                     WpExpr::LT);
+        }
 
-        void newHandleFunctionCall(Function& function) {
+        void copyToConstraintList(const std::list<NodePtr> &a, std::list<NodePtr> &target) {
+            for (NodePtr x:a)
+                target.push_back(std::make_shared<Node>(*x));
+        }
 
-            for (scc_iterator<Function *> BB = scc_begin(&function), BBE = scc_end(&function); BB != BBE; ++BB) {
+        std::list<NodePtr> newHandleFunctionCall(Function& function) {
+            std::unordered_map<BasicBlock*, std::list<NodePtr> > bb2constraintlist;
+            bool isPureFunc = false;
+            bool started = false;
+            auto inst_start = findWpEnd(function);
+            if (!inst_start)
+                return std::list<NodePtr>();
+            outs()<<"found _wp_end in function "<<function.getName()<<"\n";
+            auto wp_start = setWp(inst_start);
+            auto bb_start = inst_start->getParent();
+            std::list<NodePtr> start_cons_list;
+            start_cons_list.push_back(wp_start);
+            bb2constraintlist[bb_start] = start_cons_list;
+            BasicBlock *last = nullptr;
+            for (scc_iterator<Function *> sccIterator = scc_begin(&function), sccEnd = scc_end(&function); sccIterator != sccEnd; ++sccIterator) {
+                //(auto bbIterator = sccIterator->rbegin();bbIterator!=sccIterator->rend();++bbIterator) {
+                for (auto bbIterator = sccIterator->begin();bbIterator!=sccIterator->end();bbIterator++){
+                    auto bb = *bbIterator;
+                    std::list<NodePtr> constraint_set = bb2constraintlist[bb];
+                    outs() << bb->getName() <<"\n";
+                    for (auto succ_bb_it = succ_begin(bb), end = succ_end(bb);succ_bb_it!=end;succ_bb_it++) {
+                        BasicBlock *bbptr = *succ_bb_it;
+                        outs() << "pred bb:" << bbptr->getName() << "\n";
+                        copyToConstraintList(bb2constraintlist[bbptr], constraint_set);
+                    }
+                    for (auto insIterator = bb->rbegin();insIterator!=bb->rend();++insIterator) {
+                        auto &ins = *insIterator;
+                        if (started) {
+                            handleInstructions(constraint_set, ins, isPureFunc, function.getName());
+                        }
+                        printConstraints(constraint_set, ins);
 
+                        if (&ins == inst_start) {
+                            started = true;
+                        }
+                    }
+                    bb2constraintlist[bb] = constraint_set;
+                    //outs()<<"bb name: "<<bb->getName()<<"\n";
+                    //printConstraints(constraint_set, bb->front());
+                    last = bb;
+                }
             }
+            return bb2constraintlist[last];
         }
 
         std::list<NodePtr> handleFunctionCall(Function& function) {
@@ -217,6 +266,10 @@ namespace {
         }
 
         void printConstraints(const std::list<NodePtr> &constraint_list, const Instruction &instruction) {
+            std::string inststr;
+            raw_string_ostream rso(inststr);
+            instruction.print(rso);
+            outs() << inststr << "\n";
             if (!constraint_list.empty()) {
                 std::string wpstr_infile = "";
                 for (auto x:constraint_list) {
@@ -224,9 +277,8 @@ namespace {
                     outs() << wpstring << " or \n";
                     wpstr_infile += wpstring + " or ";
                 }
-                std::string inststr;
-                raw_string_ostream rso(inststr);
-                instruction.print(rso);
+
+
                 wpPrinter.emit(inststr, wpstr_infile);
             }
         }
@@ -254,16 +306,18 @@ namespace {
         }
 
         bool runOnModule(Module &M) override {
-            std::cout<<"init\n";
             this->modulename = std::string(M.getName());
             this->wpPrinter.open(this->modulename+std::string("_wp.md"));
-            for (Function &F : M) {
+            /*for (Function &F : M) {
                 auto ret = this->handleFunctionCall(F);
                 if (!ret.empty()){
                     for (auto expr:ret) {
                         outs() << expr->ToString() << "\n";
                     }
                 }
+            }*/
+            for (auto &F : M) {
+                newHandleFunctionCall(F);
             }
             this->wpPrinter.close();
             return false;
@@ -329,7 +383,7 @@ void MainPass::handleInstructions(std::list<NodePtr> &constraint_list,
             if (func->isDeclaration()) {
                 break;
             }
-            std::list<NodePtr> udexpr = this->handleFunctionCall(*func);
+            std::list<NodePtr> udexpr = this->newHandleFunctionCall(*func);
             if (this->visitedFunc[reinterpret_cast<uintptr_t >(func)]==NotPure) {
                 isPureFunc = false;
             }
