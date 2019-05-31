@@ -157,6 +157,33 @@ namespace {
                     for (auto insIterator = bb->rbegin();insIterator!=bb->rend();++insIterator) {
                         auto &ins = *insIterator;
                         if (started) {
+                            if (ins.getOpcode() == Instruction::PHI) {
+                                auto inst = cast<PHINode>(&ins);
+                                auto lhs = inst->getName();
+                                auto cnt = inst->getNumIncomingValues();
+                                if (cnt == 1) {
+                                    outs() << "This is not supposed to happen.\n";//TODO
+                                } else {
+                                    //first handling the first two incoming values
+                                    auto cond1 = inst->getIncomingBlock(0);
+                                    auto aug1 = HandleConstOrVar(inst->getOperand(0));
+
+                                    for (auto i = 0;i<cnt;++i) {
+                                        auto cond = inst->getIncomingBlock(i);//TODO: further consider the conditions for each blocks and remove old merges
+                                        std::list<NodePtr> &tmp_list = bb2constraintlist[cond];
+                                        auto aug = HandleConstOrVar(inst->getOperand(i));
+                                        for (auto expr:constraint_set) {
+                                            auto new_wp = std::make_shared<Node>(*expr);
+                                            Node::substitute(new_wp, inst, aug);
+                                            new_wp = Node::CreateBinOp(Node::CreateVar(cond),
+                                                                       std::move(new_wp),
+                                                                       WpExpr::AND);
+                                            tmp_list.push_back(new_wp);
+                                        }
+                                    }
+                                    outs() <<"end of handlPHI\n";
+                                }
+                            }
                             handleInstructions(constraint_set, ins, isPureFunc, function.getName());
                         }
                         printConstraints(constraint_set, ins);
