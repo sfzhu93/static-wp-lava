@@ -129,65 +129,85 @@ namespace {
                 target.push_back(std::make_shared<Node>(*x));
         }
 
-        std::list<NodePtr> newHandleFunctionCall(Function& function) {
+        std::list<NodePtr> newHandleFunctionCall(Function& function, bool started) {
+            if (function.getName()=="f") {
+                std::cout<<"in func f\n";
+            }
             std::unordered_map<BasicBlock*, std::list<NodePtr> > bb2constraintlist;
             bool isPureFunc = false;
-            bool started = false;
-            auto inst_start = findWpEnd(function);
-            if (!inst_start)
-                return std::list<NodePtr>();
-            outs()<<"found _wp_end in function "<<function.getName()<<"\n";
-            auto wp_start = setWp(inst_start);
-            auto bb_start = inst_start->getParent();
-            std::list<NodePtr> start_cons_list;
-            start_cons_list.push_back(wp_start);
-            bb2constraintlist[bb_start] = start_cons_list;
+            //started = false;
+            Instruction *inst_start;
+            if (!started) {
+                inst_start = findWpEnd(function);
+                if (!inst_start)
+                    return std::list<NodePtr>();
+                outs()<<"found _wp_end in function "<<function.getName()<<"\n";
+                auto wp_start = setWp(inst_start);
+                auto bb_start = inst_start->getParent();
+                std::list<NodePtr> start_cons_list;
+                start_cons_list.push_back(wp_start);
+                bb2constraintlist[bb_start] = start_cons_list;
+            } else {
+                inst_start = &function.back().back();
+            }
             BasicBlock *last = nullptr;
             for (scc_iterator<Function *> sccIterator = scc_begin(&function), sccEnd = scc_end(&function); sccIterator != sccEnd; ++sccIterator) {
                 //(auto bbIterator = sccIterator->rbegin();bbIterator!=sccIterator->rend();++bbIterator) {
                 for (auto bbIterator = sccIterator->begin();bbIterator!=sccIterator->end();bbIterator++){
                     auto bb = *bbIterator;
                     std::list<NodePtr> constraint_set = bb2constraintlist[bb];
-                    outs() << bb->getName() <<"\n";
+                    outs()<<"In BB: " << bb->getName() <<"\n";
                     for (auto succ_bb_it = succ_begin(bb), end = succ_end(bb);succ_bb_it!=end;succ_bb_it++) {
                         BasicBlock *bbptr = *succ_bb_it;
                         outs() << "pred bb:" << bbptr->getName() << "\n";
-                        copyToConstraintList(bb2constraintlist[bbptr], constraint_set);
+                        //copyToConstraintList(bb2constraintlist[bbptr], constraint_set);
                     }
                     for (auto insIterator = bb->rbegin();insIterator!=bb->rend();++insIterator) {
                         auto &ins = *insIterator;
                         if (started) {
-                            if (ins.getOpcode() == Instruction::PHI) {
-                                auto inst = cast<PHINode>(&ins);
-                                auto lhs = inst->getName();
-                                auto cnt = inst->getNumIncomingValues();
-                                if (cnt == 1) {
-                                    outs() << "This is not supposed to happen.\n";//TODO
+                            if (&ins == &bb->front()) {
+                                if (ins.getOpcode() == Instruction::PHI) {
+                                    auto inst = cast<PHINode>(&ins);
+                                    auto cnt = inst->getNumIncomingValues();
+                                    if (cnt == 1) {
+                                        outs() << "This is not supposed to happen.\n";//TODO
+                                    } else {
+                                        for (auto i = 0;i<cnt;++i) {
+                                            auto cond = inst->getIncomingBlock(i);//TODO: further consider the conditions for each blocks and remove old merges
+                                            std::list<NodePtr> &tmp_list = bb2constraintlist[cond];
+                                            auto aug = HandleConstOrVar(inst->getOperand(i));
+                                            for (auto expr:constraint_set) {
+                                                auto new_wp = std::make_shared<Node>(*expr);
+                                                Node::substitute(new_wp, inst, aug);
+                                                new_wp = Node::CreateBinOp(Node::CreateVar(cond),
+                                                                           std::move(new_wp),
+                                                                           WpExpr::AND);
+                                                tmp_list.push_back(new_wp);
+                                            }
+                                        }
+                                        outs() <<"end of handlPHI\n";
+                                    }
                                 } else {
-                                    //first handling the first two incoming values
-                                    auto cond1 = inst->getIncomingBlock(0);
-                                    auto aug1 = HandleConstOrVar(inst->getOperand(0));
-
-                                    for (auto i = 0;i<cnt;++i) {
-                                        auto cond = inst->getIncomingBlock(i);//TODO: further consider the conditions for each blocks and remove old merges
-                                        std::list<NodePtr> &tmp_list = bb2constraintlist[cond];
-                                        auto aug = HandleConstOrVar(inst->getOperand(i));
+                                    outs()<<"at the first ins: ";
+                                    ins.print(outs());
+                                    outs()<<"\n";
+                                    auto inst = &ins;
+                                    handleInstructions(constraint_set, ins, isPureFunc, function.getName());
+                                    if (bb != &function.front()) {
+                                        auto prevblock = bb->getSinglePredecessor();//TODO: may change to unique pred
+                                        std::list<NodePtr> &tmp_list = bb2constraintlist[prevblock];
                                         for (auto expr:constraint_set) {
                                             auto new_wp = std::make_shared<Node>(*expr);
-                                            Node::substitute(new_wp, inst, aug);
-                                            new_wp = Node::CreateBinOp(Node::CreateVar(cond),
-                                                                       std::move(new_wp),
-                                                                       WpExpr::AND);
+                                            std::cout<<"push_back "<<new_wp->ToString()<<" to "<<prevblock->getName().str() <<"\n";
                                             tmp_list.push_back(new_wp);
                                         }
                                     }
-                                    outs() <<"end of handlPHI\n";
                                 }
+                            }else {
+                                handleInstructions(constraint_set, ins, isPureFunc, function.getName());
                             }
-                            handleInstructions(constraint_set, ins, isPureFunc, function.getName());
+                            printConstraints(constraint_set, ins);
                         }
-                        printConstraints(constraint_set, ins);
-
                         if (&ins == inst_start) {
                             started = true;
                         }
@@ -344,7 +364,7 @@ namespace {
                 }
             }*/
             for (auto &F : M) {
-                newHandleFunctionCall(F);
+                newHandleFunctionCall(F, false);
             }
             this->wpPrinter.close();
             return false;
@@ -362,7 +382,7 @@ void MainPass::handleInstructions(std::list<NodePtr> &constraint_list,
     auto opcode = instruction.getOpcode();
     switch (opcode) {
         // Terminator instructions
-        case Instruction::Ret: {//TODO: handle same varibale names in different scopes
+        case Instruction::Ret: {
             auto retins = cast<ReturnInst>(&instruction);
             handleRet(*retins, constraint_list);
             break;
@@ -410,7 +430,7 @@ void MainPass::handleInstructions(std::list<NodePtr> &constraint_list,
             if (func->isDeclaration()) {
                 break;
             }
-            std::list<NodePtr> udexpr = this->newHandleFunctionCall(*func);
+            std::list<NodePtr> udexpr = this->newHandleFunctionCall(*func, true);
             if (this->visitedFunc[reinterpret_cast<uintptr_t >(func)]==NotPure) {
                 isPureFunc = false;
             }
@@ -425,8 +445,12 @@ void MainPass::handleInstructions(std::list<NodePtr> &constraint_list,
                     Node::substitute(udexpr, &(*p), arg_val);
                 }
                 //outs() << "substituted udexpr:" << udexpr->ToString() << "\n";
+                std::cout<<"before filling:\n";
+                printConstraints(constraint_list, instruction);
                 Node::fillUndeterminedPredicate(udexpr, constraint_list, &instruction);
                 constraint_list = udexpr;
+                std::cout<<"after filling:\n";
+                printConstraints(constraint_list, instruction);
             }
             break;
         }

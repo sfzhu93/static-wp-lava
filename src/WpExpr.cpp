@@ -121,6 +121,8 @@ NodePtr WpExpr::Node::CreateUndeterminedPredicate(llvm::Value *val) {
 
 void WpExpr::Node::fillUndeterminedPredicate(NodePtr &upred, const NodePtr &expr,
                                              const llvm::Value *val) {
+    std::cout<<"upred before:"<<upred->ToString()<<"\n";
+    std::cout<<"expr before:"<<expr->ToString()<<"\n";
     if (!upred)
     {
         return;
@@ -142,6 +144,8 @@ void WpExpr::Node::fillUndeterminedPredicate(NodePtr &upred, const NodePtr &expr
             fillUndeterminedPredicate(upred->left, expr, val);
             break;
     }
+    std::cout<<"upred after:"<<upred->ToString()<<"\n";
+    std::cout<<"expr after:"<<expr->ToString()<<"\n";
 }
 
 NodePtr
@@ -206,6 +210,7 @@ void Node::fillUndeterminedPredicate(std::list<std::shared_ptr<Node> > &upred, c
             tmp.push_back(std::make_shared<Node>(*upred_elem));
         }
         fillUndeterminedPredicate(tmp, expr, val);
+
         ret.splice(ret.end(), tmp);
     }
     upred = ret;
@@ -217,9 +222,13 @@ Node::fillUndeterminedPredicate(std::list<std::shared_ptr<Node> > &upred, const 
     if (upred.empty()) {
         return;
     }
-    for (auto item:upred) {
+    std::cout << "before in overloaded filling:\n";
+    std::cout << upred.front()->ToString() << "\n";
+    for (auto &item:upred) {
         fillUndeterminedPredicate(item, expr, val);
     }
+    std::cout << "after in overloaded filling:\n";
+    std::cout << upred.front()->ToString() << "\n";
 }
 
 
