@@ -1,381 +1,241 @@
 //
-// Created by suz305 on 2/26/19.
+// Created by zsf on 19-6-7.
 //
 
 #include "MainPass.h"
 
-#include "llvm/Pass.h"
-#include "llvm/Support/MemoryBuffer.h"
-
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Support/Casting.h"
-#include "llvm/IR/LegacyPassManager.h"
-#include "llvm/IR/Module.h"
-#include "llvm/IR/Function.h"
-#include "llvm/IR/CFG.h"
-#include "llvm/IR/Instruction.h"
-#include "llvm/IR/Instructions.h"
-#include "llvm/IR/InstrTypes.h"
-#include "llvm/Transforms/IPO/PassManagerBuilder.h"
-#include "llvm/ADT/SCCIterator.h"
-#include "llvm/ADT/PostOrderIterator.h"
-
-#include "WpExpr.h"
-#include "Miscs.h"
-#include "InsHandler.h"
-#include "WpPrinter.h"
-#include <iostream>
-//#include <z3++.h>
-#include <unordered_map>
-#include "MyZ3Helper.h"
-#include <list>
-#include <queue>
-#include <tuple>
-
-
-using namespace llvm;
-using namespace WpExpr;
-
-namespace {
-
-    typedef enum FuncVisitState {
-        False,
-        Pure,
-        NotPure
-    };
-
-    //ModulePass for interprocedural analysis
-    struct MainPass : public ModulePass {
-        static char ID;
-        std::string modulename;
-        MainPass() : ModulePass(ID) {}
-        NodePtr WP;
-        std::list<NodePtr> WPConstraintSet;
-        bool InWP = false;
-
-        std::unordered_map<std::uintptr_t, int> naming_map;
-        std::unordered_map<std::uintptr_t, FuncVisitState > visitedFunc;
-        std::unordered_map<std::uintptr_t, std::list<NodePtr> > PureFuncConstaintSet;
-        WpPrinter wpPrinter;
-
-        int naming_index = 0;
-
-        void getAnalysisUsage(AnalysisUsage &AU) const override {
-            AU.setPreservesAll();
-        }
-
-        std::string getName(Value *value){
-            if (value->hasName()){
-                return value->getName();
-            } else{
-                auto addr = reinterpret_cast<std::uintptr_t>(value);
-                if (this->naming_map.find(addr) == naming_map.end())
-                {
-                    this->naming_map[addr] = ++naming_index;
-                }
-                return std::to_string(this->naming_map[addr]);
-            }
-        }
-
-        void printOperandNames(Instruction &ins)
-        {
-            for(auto i = ins.op_begin(); i!=ins.op_end();++i )
-            {
-                outs()<< this->getName(i->get())<<" ";
-            }
-            outs()<<"\n";
-        }
-
-        std::string buildLavaVarName(int64_t bug_no)
-        {
-            return std::string("_lava_") + std::to_string(bug_no);
-        }
-
-        NodePtr handleGEP(GetElementPtrInst &GEPIns)
-        {
-            //TODO: add SVF support
-            outs()<<"in handelGEP:\n";
-            this->printOperandNames(GEPIns);
-        }
-
-        Instruction* findWpEnd(Function& function) {
-            Instruction* ret = nullptr;
-            for (auto& bb:function) {
-                for (auto ins = bb.rbegin(); ins != bb.rend(); ++ins) {
-                    auto opcode = ins->getOpcode();
-                    if (opcode == Instruction::Call) {
-                        auto *callInst = dyn_cast<CallInst>(&*ins);
-                        auto func = callInst->getCalledFunction();
-                        auto funcName = func->getName();
-                        if (funcName == "_wp_end") {
-                            ret = &(*ins);
-                            break;
-                        }
-                    }
-                }
-            }
-            return ret;
-        }
-
-        NodePtr setWp(Instruction *ins) {
-            auto prev_var = ins->getPrevNode();
-            return Node::CreateBinOp(Node::CreateVar(prev_var),
-                                     Node::CreateConst(std::string("1234567")),
-                                     WpExpr::LT);
-        }
-
-        void copyToConstraintList(const std::list<NodePtr> &a, std::list<NodePtr> &target) {
-            for (NodePtr x:a)
-                target.push_back(std::make_shared<Node>(*x));
-        }
-
-        std::list<NodePtr> newHandleFunctionCall(Function& function, bool started) {
-            if (function.getName()=="f") {
-                std::cout<<"in func f\n";
-            }
-            std::unordered_map<BasicBlock*, std::list<NodePtr> > bb2constraintlist;
-            bool isPureFunc = false;
-            //started = false;
-            Instruction *inst_start;
-            if (!started) {
-                inst_start = findWpEnd(function);
-                if (!inst_start)
-                    return std::list<NodePtr>();
-                outs()<<"found _wp_end in function "<<function.getName()<<"\n";
-                auto wp_start = setWp(inst_start);
-                auto bb_start = inst_start->getParent();
-                std::list<NodePtr> start_cons_list;
-                start_cons_list.push_back(wp_start);
-                bb2constraintlist[bb_start] = start_cons_list;
-            } else {
-                inst_start = &function.back().back();
-            }
-            BasicBlock *last = nullptr;
-            for (scc_iterator<Function *> sccIterator = scc_begin(&function), sccEnd = scc_end(&function); sccIterator != sccEnd; ++sccIterator) {
-                //(auto bbIterator = sccIterator->rbegin();bbIterator!=sccIterator->rend();++bbIterator) {
-                for (auto bbIterator = sccIterator->begin();bbIterator!=sccIterator->end();bbIterator++){
-                    auto bb = *bbIterator;
-                    std::list<NodePtr> constraint_set = bb2constraintlist[bb];
-                    outs()<<"In BB: " << bb->getName() <<"\n";
-                    for (auto succ_bb_it = succ_begin(bb), end = succ_end(bb);succ_bb_it!=end;succ_bb_it++) {
-                        BasicBlock *bbptr = *succ_bb_it;
-                        outs() << "pred bb:" << bbptr->getName() << "\n";
-                        //copyToConstraintList(bb2constraintlist[bbptr], constraint_set);
-                    }
-                    for (auto insIterator = bb->rbegin();insIterator!=bb->rend();++insIterator) {
-                        auto &ins = *insIterator;
-                        if (started) {
-                            if (&ins == &bb->front()) {
-                                if (ins.getOpcode() == Instruction::PHI) {
-                                    auto inst = cast<PHINode>(&ins);
-                                    auto cnt = inst->getNumIncomingValues();
-                                    if (cnt == 1) {
-                                        outs() << "This is not supposed to happen.\n";//TODO
-                                    } else {
-                                        for (auto i = 0;i<cnt;++i) {
-                                            auto cond = inst->getIncomingBlock(i);//TODO: further consider the conditions for each blocks and remove old merges
-                                            std::list<NodePtr> &tmp_list = bb2constraintlist[cond];
-                                            auto aug = HandleConstOrVar(inst->getOperand(i));
-                                            for (auto expr:constraint_set) {
-                                                auto new_wp = std::make_shared<Node>(*expr);
-                                                Node::substitute(new_wp, inst, aug);
-                                                new_wp = Node::CreateBinOp(Node::CreateVar(cond),
-                                                                           std::move(new_wp),
-                                                                           WpExpr::AND);
-                                                tmp_list.push_back(new_wp);
-                                            }
-                                        }
-                                        outs() <<"end of handlPHI\n";
-                                    }
-                                } else {
-                                    outs()<<"at the first ins: ";
-                                    ins.print(outs());
-                                    outs()<<"\n";
-                                    auto inst = &ins;
-                                    handleInstructions(constraint_set, ins, isPureFunc, function.getName());
-                                    if (bb != &function.front()) {
-                                        auto prevblock = bb->getSinglePredecessor();//TODO: may change to unique pred
-                                        std::list<NodePtr> &tmp_list = bb2constraintlist[prevblock];
-                                        for (auto expr:constraint_set) {
-                                            auto new_wp = std::make_shared<Node>(*expr);
-                                            std::cout<<"push_back "<<new_wp->ToString()<<" to "<<prevblock->getName().str() <<"\n";
-                                            tmp_list.push_back(new_wp);
-                                        }
-                                    }
-                                }
-                            }else {
-                                handleInstructions(constraint_set, ins, isPureFunc, function.getName());
-                            }
-                            printConstraints(constraint_set, ins);
-                        }
-                        if (&ins == inst_start) {
-                            started = true;
-                        }
-                    }
-                    bb2constraintlist[bb] = constraint_set;
-                    //outs()<<"bb name: "<<bb->getName()<<"\n";
-                    //printConstraints(constraint_set, bb->front());
-                    last = bb;
-                }
-            }
-            return bb2constraintlist[last];
-        }
-
-        std::list<NodePtr> handleFunctionCall(Function& function) {
-            for (scc_iterator<Function *> BB = scc_begin(&function), BBE = scc_end(&function); BB != BBE; ++BB) {
-                const std::vector<BasicBlock *> &SCCBBs = *BB;
-                outs() << SCCBBs.size()<<"\n";
-                for (auto BBI = SCCBBs.begin(); BBI != SCCBBs.end(); ++BBI) {
-                    outs() << "In BB:" << (*BBI)->getName() << "\n";
-                    this->wpPrinter.setBlockName((*BBI)->getName());
-                }
-            }
-
-            bool isPureFunc = true;
-            bool hasCalculatedWP = false;
-            if (this->InWP) {
-                hasCalculatedWP = true;
-            }
-            auto funcAddr = reinterpret_cast<uintptr_t >(&function);
-            if (this->visitedFunc.find(funcAddr)!=this->visitedFunc.end() && this->visitedFunc[funcAddr]==Pure){
-                return this->PureFuncConstaintSet[funcAddr];
-            }
-
-            NodePtr expr;
-            std::list<NodePtr> constraint_list;
-            outs() << "In Function:" << function.getName() << "()\n";
-            this->wpPrinter.setFuncName(function.getName());
-            if (function.isDeclaration()) {
-                return std::list<NodePtr>();
-            }
-
-            Instruction *start_ins = nullptr;
-            BasicBlock *start_block = nullptr;
-            for (auto& bb:function) {
-                for (auto ins = bb.rbegin(); ins != bb.rend(); ++ins) {
-                    auto opcode = ins->getOpcode();
-                    if (opcode == Instruction::Call) {
-                        auto *callInst = dyn_cast<CallInst>(&*ins);
-                        auto func = callInst->getCalledFunction();
-                        auto funcName = func->getName();
-                        outs()<<funcName<<"\n";
-                        if (funcName == "_wp_end") {
-                            start_ins = &(*ins);
-                            start_block = &bb;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (!start_ins)
-                return constraint_list;
-
-            auto prev_var = start_ins->getPrevNode();
-            expr = Node::CreateBinOp(Node::CreateVar(prev_var),
-                                     Node::CreateConst(std::string("1234567")),
-                                     WpExpr::LT);
-
-            std::queue<std::tuple<Instruction*, std::list<NodePtr> > > workQueue;
-            std::list<NodePtr> start_nodelist = {expr};
-            workQueue.push(std::make_tuple(start_ins, start_nodelist));
-            std::unordered_map<std::uintptr_t, FuncVisitState > visitedBasicBlocks;
-
-            while (!workQueue.empty()) {
-                auto headvalue = workQueue.front();
-                workQueue.pop();
-                auto ins = std::get<0>(headvalue);
-                auto li = std::get<1>(headvalue);
-                for (auto i = ins;i!= nullptr;i = i->getPrevNode()) {
-                    //outs()<<"ins ite: ";
-                    i->print(outs());
-                    outs()<<"\n";
-                    handleInstructions(li, *i, isPureFunc, function.getName());
-                    printConstraints(li, *i);
-                }
-                auto bb = start_ins->getParent();
-                for (auto it = pred_begin(bb), et = pred_end(bb); it != et; ++it) {
-                    outs() << "pred bbs: " << (*it)->getName()<<"\n";
-                }
-
-            }
-
-            EliminateUnsatConstraints(constraint_list);
-            if (hasCalculatedWP) {
-                if (isPureFunc) {
-                    this->visitedFunc[funcAddr] = Pure;
-                    this->PureFuncConstaintSet[funcAddr] = constraint_list;
-                }
-                else
-                    this->visitedFunc[funcAddr] = NotPure;
-            }
-            return constraint_list;
-        }
-
-        void printConstraints(const std::list<NodePtr> &constraint_list, const Instruction &instruction) {
-            std::string inststr;
-            raw_string_ostream rso(inststr);
-            instruction.print(rso);
-            outs() << inststr << "\n";
-            if (!constraint_list.empty()) {
-                std::string wpstr_infile = "";
-                for (auto x:constraint_list) {
-                    auto wpstring = x->ToString();
-                    outs() << wpstring << " or \n";
-                    wpstr_infile += wpstring + " or ";
-                }
-
-
-                wpPrinter.emit(inststr, wpstr_infile);
-            }
-        }
-
-        void EliminateUnsatConstraints(std::list<NodePtr> &constraint_list) const {
-            SolverContext sc;
-            solver s(sc.Context);
-            /*for (auto e:constraint_list) {
-                std::cout<<e->ToString()<<"\n";
-                s.add(sc.WpExprToZ3Expr(e));
-                auto ret = s.check();
-                //sc.Reset();
-                s.reset();
-                std::cout<<(ret==unsat)<<"\n";
-            }*/
-            constraint_list.remove_if([&sc, &s](NodePtr &e) {
-                //std::cout<<e->ToString();
-                s.add(sc.WpExprToZ3Expr(e));
-                auto ret = s.check();
-                s.reset();
-                sc.Reset();
-                //std::cout<<" "<< (ret == unsat) <<"\n";
-                return ret == unsat;
-            });
-        }
-
-        bool runOnModule(Module &M) override {
-            this->modulename = std::string(M.getName());
-            this->wpPrinter.open(this->modulename+std::string("_wp.md"));
-            /*for (Function &F : M) {
-                auto ret = this->handleFunctionCall(F);
-                if (!ret.empty()){
-                    for (auto expr:ret) {
-                        outs() << expr->ToString() << "\n";
-                    }
-                }
-            }*/
-            for (auto &F : M) {
-                newHandleFunctionCall(F, false);
-            }
-            this->wpPrinter.close();
-            return false;
-        }
-
-        void handleInstructions(std::list<NodePtr> &constraint_list, Instruction &instruction, bool &isPureFunc,
-                            std::string FuncName);
-    };
-}
 
 char MainPass::ID = 0;
+
+static RegisterPass<MainPass> X("wpgen","Weakest Precondition Analysis");
+
+
+// http://adriansampson.net/blog/clangpass.html
+static void registerPass(const PassManagerBuilder &,
+                         legacy::PassManagerBase &PM) {
+    PM.add(new MainPass());
+}
+static RegisterStandardPasses
+        RegisterMyPass(PassManagerBuilder::EP_EarlyAsPossible,
+                       registerPass);
+
+void MainPass::getAnalysisUsage(AnalysisUsage &AU) const {
+    AU.setPreservesAll();
+}
+
+std::string MainPass::getName(Value *value) {
+    if (value->hasName()){
+        return value->getName();
+    } else{
+        auto addr = reinterpret_cast<std::uintptr_t>(value);
+        if (this->naming_map.find(addr) == naming_map.end())
+        {
+            this->naming_map[addr] = ++naming_index;
+        }
+        return std::to_string(this->naming_map[addr]);
+    }
+}
+
+void MainPass::printOperandNames(Instruction &ins) {
+    for(auto i = ins.op_begin(); i!=ins.op_end();++i )
+    {
+        outs()<< this->getName(i->get())<<" ";
+    }
+    outs()<<"\n";
+}
+
+std::string MainPass::buildLavaVarName(int64_t bug_no) {
+    return std::string("_lava_") + std::to_string(bug_no);
+}
+
+NodePtr MainPass::handleGEP(GetElementPtrInst &GEPIns) {
+    //TODO: add SVF support
+    outs()<<"in handelGEP:\n";
+    this->printOperandNames(GEPIns);
+}
+
+Instruction *MainPass::findWpEnd(Function &function) {
+    Instruction* ret = nullptr;
+    for (auto& bb:function) {
+        for (auto ins = bb.rbegin(); ins != bb.rend(); ++ins) {
+            auto opcode = ins->getOpcode();
+            if (opcode == Instruction::Call) {
+                auto *callInst = dyn_cast<CallInst>(&*ins);
+                auto func = callInst->getCalledFunction();
+                auto funcName = func->getName();
+                if (funcName == "_wp_end") {
+                    ret = &(*ins);
+                    break;
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+NodePtr MainPass::setWp(Instruction *ins) {
+    auto prev_var = ins->getPrevNode();
+    return Node::CreateBinOp(Node::CreateVar(prev_var),
+                             Node::CreateConst(std::string("1234567")),
+                             WpExpr::LT);
+}
+
+void MainPass::copyToConstraintList(const std::list<NodePtr> &a, std::list<NodePtr> &target) {
+    for (NodePtr x:a)
+        target.push_back(std::make_shared<Node>(*x));
+}
+
+std::list<NodePtr> MainPass::newHandleFunctionCall(Function &function, bool started) {
+    if (function.getName()=="f") {
+        std::cout<<"in func f\n";
+    }
+    std::unordered_map<BasicBlock*, std::list<NodePtr> > bb2constraintlist;
+    bool isPureFunc = false;
+    //started = false;
+    Instruction *inst_start;
+    if (!started) {
+        inst_start = findWpEnd(function);
+        if (!inst_start)
+            return std::list<NodePtr>();
+        outs()<<"found _wp_end in function "<<function.getName()<<"\n";
+        auto wp_start = setWp(inst_start);
+        auto bb_start = inst_start->getParent();
+        std::list<NodePtr> start_cons_list;
+        start_cons_list.push_back(wp_start);
+        bb2constraintlist[bb_start] = start_cons_list;
+    } else {
+        inst_start = &function.back().back();
+    }
+    BasicBlock *last = nullptr;
+    for (scc_iterator<Function *> sccIterator = scc_begin(&function), sccEnd = scc_end(&function); sccIterator != sccEnd; ++sccIterator) {
+        //(auto bbIterator = sccIterator->rbegin();bbIterator!=sccIterator->rend();++bbIterator) {
+        for (auto bbIterator = sccIterator->begin();bbIterator!=sccIterator->end();bbIterator++){
+            auto bb = *bbIterator;
+            std::list<NodePtr> constraint_set = bb2constraintlist[bb];
+            outs()<<"In BB: " << bb->getName() <<"\n";
+            for (auto succ_bb_it = succ_begin(bb), end = succ_end(bb);succ_bb_it!=end;succ_bb_it++) {
+                BasicBlock *bbptr = *succ_bb_it;
+                outs() << "pred bb:" << bbptr->getName() << "\n";
+                //copyToConstraintList(bb2constraintlist[bbptr], constraint_set);
+            }
+            for (auto insIterator = bb->rbegin();insIterator!=bb->rend();++insIterator) {
+                auto &ins = *insIterator;
+                if (started) {
+                    if (&ins == &bb->front()) {
+                        if (ins.getOpcode() == Instruction::PHI) {
+                            auto inst = cast<PHINode>(&ins);
+                            auto cnt = inst->getNumIncomingValues();
+                            if (cnt == 1) {
+                                outs() << "This is not supposed to happen.\n";//TODO
+                            } else {
+                                for (auto i = 0;i<cnt;++i) {
+                                    auto cond = inst->getIncomingBlock(i);
+                                    std::list<NodePtr> &tmp_list = bb2constraintlist[cond];
+                                    auto aug = HandleConstOrVar(inst->getOperand(i));
+                                    for (auto expr:constraint_set) {
+                                        auto new_wp = std::make_shared<Node>(*expr);
+                                        Node::substitute(new_wp, inst, aug);
+                                        new_wp = Node::CreateBinOp(Node::CreateVar(cond),
+                                                                   std::move(new_wp),
+                                                                   WpExpr::AND);
+                                        tmp_list.push_back(new_wp);
+                                    }
+                                }
+                                outs() <<"end of handling PHI\n";
+                            }
+                        } else {
+                            outs()<<"at the first ins: ";
+                            ins.print(outs());
+                            outs()<<"\n";
+                            auto inst = &ins;
+                            handleInstructions(constraint_set, ins, isPureFunc, function.getName());
+                            if (bb != &function.front()) {
+                                auto prevblock = bb->getSinglePredecessor();//TODO: may change to unique pred
+                                std::list<NodePtr> &tmp_list = bb2constraintlist[prevblock];
+                                for (auto expr:constraint_set) {
+                                    auto new_wp = std::make_shared<Node>(*expr);
+                                    std::cout<<"push_back "<<new_wp->ToString()<<" to "<<prevblock->getName().str() <<"\n";
+                                    tmp_list.push_back(new_wp);
+                                }
+                            }
+                        }
+                    }else {
+                        handleInstructions(constraint_set, ins, isPureFunc, function.getName());
+                    }
+                    printConstraints(constraint_set, ins);
+                }
+                if (&ins == inst_start) {
+                    started = true;
+                }
+            }
+            //EliminateUnsatConstraints(constraint_set);
+            printConstraints(constraint_set, bb->front());
+            bb2constraintlist[bb] = constraint_set;
+            //outs()<<"bb name: "<<bb->getName()<<"\n";
+            //printConstraints(constraint_set, bb->front());
+            last = bb;
+        }
+    }
+    return bb2constraintlist[last];
+}
+
+void MainPass::printConstraints(const std::list<NodePtr> &constraint_list, const Instruction &instruction) {
+    std::string inststr;
+    raw_string_ostream rso(inststr);
+    instruction.print(rso);
+    outs() << inststr << "\n";
+    if (!constraint_list.empty()) {
+        std::string wpstr_infile = "";
+        for (auto x:constraint_list) {
+            auto wpstring = x->ToString();
+            outs() << wpstring << " or \n";
+            wpstr_infile += wpstring + " or ";
+        }
+
+
+        wpPrinter.emit(inststr, wpstr_infile);
+    }
+}
+
+void MainPass::EliminateUnsatConstraints(std::list<NodePtr> &constraint_list) const {
+    SolverContext sc;
+    solver s(sc.Context);
+    /*for (auto e:constraint_list) {
+        std::cout<<e->ToString()<<"\n";
+        s.add(sc.WpExprToZ3Expr(e));
+        auto ret = s.check();
+        //sc.Reset();
+        s.reset();
+        std::cout<<(ret==unsat)<<"\n";
+    }*/
+    constraint_list.remove_if([&sc, &s](NodePtr &e) {
+        //std::cout<<e->ToString();
+        s.add(sc.WpExprToZ3Expr(e));
+        auto ret = s.check();
+        s.reset();
+        sc.Reset();
+        //std::cout<<" "<< (ret == unsat) <<"\n";
+        return ret == unsat;
+    });
+}
+
+bool MainPass::runOnModule(Module &M) {
+    this->modulename = std::string(M.getName());
+    this->wpPrinter.open(this->modulename+std::string("_wp.md"));
+    /*for (Function &F : M) {
+        auto ret = this->handleFunctionCall(F);
+        if (!ret.empty()){
+            for (auto expr:ret) {
+                outs() << expr->ToString() << "\n";
+            }
+        }
+    }*/
+    for (auto &F : M) {
+        newHandleFunctionCall(F, false);
+    }
+    this->wpPrinter.close();
+    return false;
+}
 
 void MainPass::handleInstructions(std::list<NodePtr> &constraint_list,
                                   Instruction &instruction, bool &isPureFunc, std::string FuncName) {
@@ -598,19 +458,3 @@ void MainPass::handleInstructions(std::list<NodePtr> &constraint_list,
     }
 
 }
-//For opt
-
-static RegisterPass<MainPass> X("wpgen","Weakest Precondition Analysis");
-
-
-
-
-// Automatically enable the pass for Clang .
-// http://adriansampson.net/blog/clangpass.html
-static void registerPass(const PassManagerBuilder &,
-                         legacy::PassManagerBase &PM) {
-    PM.add(new MainPass());
-}
-static RegisterStandardPasses
-        RegisterMyPass(PassManagerBuilder::EP_EarlyAsPossible,
-                       registerPass);

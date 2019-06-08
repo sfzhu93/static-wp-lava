@@ -107,7 +107,6 @@ void handleRet(ReturnInst &inst, std::list<NodePtr> &expr_list) {
 
     } /*else
         expr = NodePtr();*/
-
 }
 
 void handleBranch(BranchInst &inst, std::list<NodePtr> &expr_list) {
@@ -123,7 +122,6 @@ void handleBranch(BranchInst &inst, std::list<NodePtr> &expr_list) {
 
     }
 }
-
 
 void handleSelect(SelectInst &inst, std::list<NodePtr> &expr_list) {
     auto cond = inst.getOperand(0);
