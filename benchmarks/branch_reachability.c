@@ -25,7 +25,7 @@ int hello(int a, int b, int c){
     return x;
 }
 
-int hello2(int a, int b, int c){
+/*int hello2(int a, int b, int c){
     int x;
     _wp_begin();
     if (a<0)
@@ -61,4 +61,4 @@ int hello3(int a, int b, int c){
     x = a+b+c;
     _wp_end("");
     return x;
-}
+}*/

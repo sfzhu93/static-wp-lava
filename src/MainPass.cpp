@@ -109,15 +109,20 @@ std::list<NodePtr> MainPass::newHandleFunctionCall(Function &function, bool star
     BasicBlock *last = nullptr;
     for (scc_iterator<Function *> sccIterator = scc_begin(&function), sccEnd = scc_end(&function); sccIterator != sccEnd; ++sccIterator) {
         //(auto bbIterator = sccIterator->rbegin();bbIterator!=sccIterator->rend();++bbIterator) {
+
+        bool makeHeuristics = sccIterator->size()>1;//TODO: check a basic block pointing to itself
+        std::cout << "make heuristics = "<<makeHeuristics <<"\n";
+        std::cout << "scc size = "<< sccIterator->size() <<"\n";
+        for (int heuristic_counter = 0; heuristic_counter < 1+ makeHeuristics?3:0; heuristic_counter++)
         for (auto bbIterator = sccIterator->begin();bbIterator!=sccIterator->end();bbIterator++){
             auto bb = *bbIterator;
             std::list<NodePtr> constraint_set = bb2constraintlist[bb];
             outs()<<"In BB: " << bb->getName() <<"\n";
-            for (auto succ_bb_it = succ_begin(bb), end = succ_end(bb);succ_bb_it!=end;succ_bb_it++) {
+            /*for (auto succ_bb_it = succ_begin(bb), end = succ_end(bb);succ_bb_it!=end;succ_bb_it++) {
                 BasicBlock *bbptr = *succ_bb_it;
                 outs() << "pred bb:" << bbptr->getName() << "\n";
                 //copyToConstraintList(bb2constraintlist[bbptr], constraint_set);
-            }
+            }*/
             for (auto insIterator = bb->rbegin();insIterator!=bb->rend();++insIterator) {
                 auto &ins = *insIterator;
                 if (started) {

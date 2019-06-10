@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #SAMPLE=func_call1
-SAMPLE=branch
+SAMPLE=loop
 #SAMPLE=switch_tax_calc
 #SAMPLE=herons_formula
 #SAMPLE=branch_reachability
