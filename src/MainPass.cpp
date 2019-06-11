@@ -24,16 +24,16 @@ void MainPass::getAnalysisUsage(AnalysisUsage &AU) const {
 }
 
 std::string MainPass::getName(Value *value) {
-    if (value->hasName()){
+//    if (value->hasName()){
         return value->getName();
-    } else{
-        auto addr = reinterpret_cast<std::uintptr_t>(value);
+//    } else{
+/*        auto addr = reinterpret_cast<std::uintptr_t>(value);
         if (this->naming_map.find(addr) == naming_map.end())
         {
             this->naming_map[addr] = ++naming_index;
         }
         return std::to_string(this->naming_map[addr]);
-    }
+    }*/
 }
 
 void MainPass::printOperandNames(Instruction &ins) {

@@ -4,6 +4,7 @@
 
 #include "WpExpr.h"
 #include "Miscs.h"
+
 /*namespace WpExpr{
     Node::NodePtr BinOp::substitute(std::string &name, Node::NodePtr node) {
         if (dynamic_cast<Var&>(*(this->left))
@@ -232,3 +233,13 @@ Node::fillUndeterminedPredicate(std::list<std::shared_ptr<Node> > &upred, const 
 }
 
 
+void Conjunction::Insert(NodePtr nodePtr) {
+    std::string expr_str;
+    expr_str = nodePtr->ToString();
+
+    //auto x = visitedExprString.find();
+    if (this->visitedExprString.find(expr_str) == this->visitedExprString.end()) {
+        this->visitedExprString.insert(expr_str);
+        this->conjunctionList.push_back(nodePtr);
+    }
+}

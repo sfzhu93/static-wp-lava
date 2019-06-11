@@ -10,6 +10,8 @@
 #include "llvm/Support/raw_ostream.h"
 #include "z3++.h"
 #include <list>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace WpExpr{
     enum NodeType {
@@ -83,7 +85,12 @@ namespace WpExpr{
     typedef std::shared_ptr<WpExpr::Node> NodePtr;
     //static NodePtr substitute(NodePtr &src, const llvm::Value *val, const NodePtr &expr);
 
-
+    class Conjunction {
+    public:
+        std::unordered_set<std::string> visitedExprString;
+        std::list<NodePtr> conjunctionList;
+        void Insert(NodePtr nodePtr);
+    };
 
 }
 
