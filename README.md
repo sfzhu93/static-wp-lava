@@ -1,6 +1,6 @@
 # Weakest Preconditions on LAVA dataset
 
-Make with cmake. Run `run.sh` to run the main pass. The llvm pass to run is implemented in `MainPass.cpp`.
+Make with cmake. On Debian 12, using the default `LLVM 16` and `libz3` dependencies from `apt` can work. Requires Run `run.sh` to run the main pass. The llvm pass to run is implemented in `MainPass.cpp`.
 
 benchmarks
 ==========
