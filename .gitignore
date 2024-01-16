@@ -4,4 +4,5 @@ build*/*
 *.png
 *.dot
 *.bc
+.cache
 

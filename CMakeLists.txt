@@ -1,22 +1,39 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.19)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project(static_wp_lava)
-find_package(LLVM REQUIRED CONFIG)
 
-set(CMAKE_CXX_STANDARD 14)
+find_package(LLVM 16 REQUIRED CONFIG)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 add_definitions(${LLVM_DEFINITIONS})
+
 include_directories(${LLVM_INCLUDE_DIRS})
-link_libraries(z3)
+include_directories(include)
 
-link_directories(${LLVM_LIBRARY_DIRS})
+file(GLOB SOURCES "src/*.cpp")
 
-add_library(static_wp_lava SHARED src/MainPass.cpp src/MainPass.h src/WpExpr.cpp src/WpExpr.h src/InsHandler.cpp src/InsHandler.h src/Miscs.cpp src/Miscs.h src/MyZ3Helper.h)
+add_library(static_wp_lava SHARED ${SOURCES})
+# add_llvm_pass_plugin(static_wp_lava)
+target_compile_definitions(static_wp_lava PRIVATE ${LLVM_DEFINITIONS})
 
+llvm_map_components_to_libnames(llvm_libs support core)
+# target_link_libraries(static_wp_lava PRIVATE ${llvm_libs} z3)
+target_link_libraries(static_wp_lava PRIVATE LLVM z3)
+
+# Compiler options
+if(NOT LLVM_ENABLE_RTTI)
 set_target_properties(static_wp_lava PROPERTIES
-        COMPILE_FLAGS "-fno-rtti"
-        )
+    COMPILE_FLAGS "-fno-rtti"
+)
+endif()
 
-#add_executable(test_expr src/WpExpr.h src/WpExpr.cpp src/test_expr.cpp)
 
-#set_target_properties(test_expr PROPERTIES
-#        COMPILE_FLAGS "-fno-rtti"
-#        )
+# Test executable
+# add_executable(test_expr tests/test_expr.cpp)
+# target_link_libraries(test_expr PRIVATE static_wp_lava z3)

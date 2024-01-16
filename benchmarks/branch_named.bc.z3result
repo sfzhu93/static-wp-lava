@@ -1,0 +1,5 @@
+(goals
+(goal
+  (let ((a!1 (and (not (> (+ null null) 2)) (< null 1234567))))
+    (or (< null 1234567) a!1)))
+)
